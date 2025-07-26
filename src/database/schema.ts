@@ -33,20 +33,26 @@ export const Wallet = mongoose.model("Wallet", walletSchema);
 
 // Trade Document
 const tradeSchema = new Schema({
-  walletId: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Wallet",
+    ref: "User",
+    required: [true, "No userId provided"],
+    index: true,
   },
-  tokenAddress: String,
-  action: String,
-  amountIn: {
-    type: mongoose.Schema.Types.Double,
+  type: {
+    type: String,
+    required: true,
+    enum: ["buy", "sell"],
   },
-  amountOut: {
-    type: mongoose.Schema.Types.Double,
+  token: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (v: string) {
+        return /^[A-HJ-NP-Z1-9a-km-z]{32,44}$/.test(v);
+      },
+    },
   },
-  price: Number,
-  status: String,
 });
 
 export const Trade = mongoose.model("Trade", tradeSchema);

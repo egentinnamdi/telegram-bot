@@ -97,7 +97,7 @@ const manageWallet = async (ctx: Context) => {
       reply_markup: {
         inline_keyboard: [
           [{ text: "➕ Add Wallet", callback_data: "add_wallet" }],
-          [{ text: "🔙 Back", callback_data: "main" }],
+          [{ text: "🔙 Back", callback_data: "manage_wallet" }],
         ],
       },
       reply_parameters: {
@@ -110,7 +110,7 @@ const manageWallet = async (ctx: Context) => {
 *💼 Your Linked Wallets*
 
 ${wallets.map((item, index) =>
-  `${index + 1}. ${item.walletName}\n`.replace(",", "")
+  `${index + 1}. ${item.walletName}\n`.replaceAll(",", "")
 )}
 
 _You can add up to 5 wallets._
