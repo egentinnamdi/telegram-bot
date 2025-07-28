@@ -94,7 +94,8 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       const publicKey = keypair.publicKey;
 
       // Wallet Private Key
-      const privateKey = keypair.secretKey;
+
+      const privateKey = base58.encode(keypair.secretKey);
 
       // Onchain (solana) information
       const balance = await connection.getBalance(publicKey);

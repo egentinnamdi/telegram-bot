@@ -48,6 +48,7 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
       `✅ Wallet created, this is your public key ${keypair.publicKey.toBase58()}`
     );
 
+    const encodedSecretKey = base58.encode(keypair.secretKey);
     // Save private / secret key to database for wallet retrieval
     const balance = await connection.getBalance(keypair.publicKey);
 
@@ -56,7 +57,7 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
       userId: (ctx.scene.state as { id: mongoose.Types.ObjectId }).id,
       telegramId: ctx.from?.id,
       chatId: ctx.chat?.id,
-      privateKey: keypair.secretKey,
+      privateKey: encodedSecretKey,
       publicKey: keypair.publicKey,
       timeStamp: Date.now(),
       chain: "solana",
