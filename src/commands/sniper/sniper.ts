@@ -1,5 +1,5 @@
 import { GetProgramAccountsConfig, PublicKey } from "@solana/web3.js";
-import { httpConnection } from "../../bot";
+import { connection } from "../../bot";
 
 let config: GetProgramAccountsConfig = {
   commitment: "finalized",
@@ -16,7 +16,7 @@ let config: GetProgramAccountsConfig = {
   ],
 };
 
-httpConnection.getProgramAccounts(
+connection.getProgramAccounts(
   new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"),
   config
 );
