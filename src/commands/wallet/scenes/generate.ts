@@ -20,24 +20,17 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
       }
 
       // Get wallet
-      const walletExists = await Wallet.findOne({
-        $and: [{ userId: user?._id }, { botGenerated: true }],
+      const walletExists = await Wallet.find({
+        userId: user?._id,
       });
 
-      if (walletExists && walletExists.privateKey) {
-        const privatekey = walletExists.privateKey;
-        // since user exists, retrieve wallet using the secret key
-        const keypairBytes = base58.decode(privatekey);
-
-        const keypair = Keypair.fromSecretKey(keypairBytes);
-
-        ctx.reply(`Wallet found, this is your public key ${keypair.publicKey}`);
-
+      if (walletExists.length === 5) {
+        ctx.reply(`⚠️ Maximum number of wallets you can own is 5`);
         return ctx.scene.leave();
       }
 
       // Ask for wallet Name
-      ctx.reply("What name do you want to call this wallet?");
+      ctx.reply("1️⃣ What name do you want to call this wallet?");
 
       return ctx.wizard.next();
     } catch (err) {

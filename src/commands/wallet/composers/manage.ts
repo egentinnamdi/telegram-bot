@@ -56,6 +56,9 @@ ${item.botGenerated ? "Yes" : "No"}
               },
             ],
             [{ text: " ❌ Remove Wallet", callback_data: "remove_wallet" }],
+            item.botGenerated
+              ? [{ text: " 📩 Export Wallet", callback_data: "export_wallet" }]
+              : [],
           ],
         },
       }
@@ -186,3 +189,23 @@ walletComposer.action("find_remove_wallet", async (ctx) => {
 walletComposer.action("fund_wallet", async (ctx) =>
   ctx.scene.enter("fundWallet")
 );
+
+// Export
+walletComposer.action("export_wallet", async (ctx) => {
+  const wallet = await Wallet.findOne({
+    telegramId: ctx.from?.id,
+  });
+  ctx.replyWithMarkdownV2(
+    escapeMarkdownV2(
+      `
+🔑 Your Private Key:
+${wallet?.privateKey}
+
+⚠️ WARNING:
+Never share this private key with anyone!  
+Anyone who has it can take full control of your wallet and all its funds.  
+Keep it safe and secure. 🛡️
+    `
+    )
+  );
+});

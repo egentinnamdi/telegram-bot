@@ -22,13 +22,13 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
     // Redirect and leave scene if user doesn't exist
     if (!user) {
       await ctx.reply(
-        "User not found, first create a user profile by running /start"
+        "⛔ User not found, first create a user profile by running /start"
       );
       return ctx.scene.leave();
     }
 
     (ctx.scene.state as WalletState).user = user;
-    await ctx.reply("What do you want to call this wallet?");
+    await ctx.reply("1️⃣ What do you want to call this wallet?");
 
     return ctx.wizard.next();
   },
@@ -36,7 +36,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
   // Step Two - Import Wallet Private Key
   async (ctx) => {
     (ctx.scene.state as WalletState).name = ctx.text ?? "";
-    ctx.reply("To import your wallet, Enter it's private key");
+    ctx.reply("🔐 To import your wallet, Enter it's private key");
     return ctx.wizard.next();
   },
 
@@ -44,14 +44,14 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
   async (ctx) => {
     try {
       if (!ctx.text) {
-        return ctx.reply("Please provide your wallet private key");
+        return ctx.reply("🔑 Please provide your wallet private key");
       }
       if (ctx.text.toLowerCase() === "new") {
-        ctx.reply("Restarting the process, please type `continue`");
+        ctx.reply("🔃 Restarting the process, please type `continue`");
         return ctx.wizard.selectStep(0);
       }
       if (ctx.text.toLowerCase() === "cancel") {
-        ctx.reply("Process cancelled");
+        ctx.reply("❎ Process cancelled");
         return ctx.scene.leave();
       }
 
