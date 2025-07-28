@@ -1,22 +1,16 @@
-import { Connection, Keypair } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import base58 from "bs58";
 import { Scenes } from "telegraf";
-import { MyContext } from "../../../bot";
+import { connection, MyContext } from "../../../bot";
 import { User, userSchema, Wallet } from "../../../database/schema";
 import { InferSchemaType, Types } from "mongoose";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
-import { walletComposer } from "../composers/manage";
 
 type WalletState = {
   name: string;
   private: string;
   user: InferSchemaType<typeof userSchema> & { _id: Types.ObjectId };
 };
-
-// Connection to solana blockchain
-export const connection = new Connection(
-  "https://mainnet.helius-rpc.com/?api-key=b2b84548-7f40-4f69-a7ba-a5fd6c48345c"
-);
 
 // Everything that happens when user enter /addwallet command
 export const addWallet = new Scenes.WizardScene<MyContext>(
@@ -109,6 +103,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
         walletName,
         userId: _id,
         telegramId: ctx.from?.id,
+        chatId: ctx.chat?.id,
         privateKey,
         publicKey,
         balance,
@@ -118,11 +113,12 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       };
       await Wallet.create(walletObj);
 
-      ctx.reply("Wallet Imported Successfully...");
+      ctx.reply("✅ Wallet Imported Successfully...");
 
       return ctx.scene.leave();
     } catch (err) {
       const error = err as Error;
+      console.log(error);
       ctx.reply("❌ Invalid private key, please try again");
 
       return ctx.scene.leave();

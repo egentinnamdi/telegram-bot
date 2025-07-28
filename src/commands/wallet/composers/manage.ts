@@ -49,13 +49,13 @@ ${item.botGenerated ? "Yes" : "No"}
       {
         reply_markup: {
           inline_keyboard: [
-            [{ text: " ❌ Remove Wallet", callback_data: "remove_wallet" }],
             [
               {
-                text: "🔙 Back to Wallet List",
-                callback_data: "manage_wallet",
+                text: "💵 Fund Wallet",
+                callback_data: "fund_wallet",
               },
             ],
+            [{ text: " ❌ Remove Wallet", callback_data: "remove_wallet" }],
           ],
         },
       }
@@ -71,7 +71,8 @@ const noWalletYet = escapeMarkdownV2(`
 
 _No wallets have been added yet._
 
-➡️ Tap **"Add Wallet"** to link your first wallet.
+➡️ Tap **"➕ Add Wallet"** to link your first wallet or **"🔃 Generate Wallet"** to create a new wallet.
+
 `);
 
 const manageWallet = async (ctx: Context) => {
@@ -97,7 +98,7 @@ const manageWallet = async (ctx: Context) => {
       reply_markup: {
         inline_keyboard: [
           [{ text: "➕ Add Wallet", callback_data: "add_wallet" }],
-          [{ text: "🔙 Back", callback_data: "manage_wallet" }],
+          [{ text: "🔃 Generate Wallet", callback_data: "generate_wallet" }],
         ],
       },
       reply_parameters: {
@@ -181,4 +182,7 @@ walletComposer.action("find_remove_wallet", async (ctx) => {
   await ctx.scene.enter("removeWallet");
 });
 
-// Update
+// Fund
+walletComposer.action("fund_wallet", async (ctx) =>
+  ctx.scene.enter("fundWallet")
+);

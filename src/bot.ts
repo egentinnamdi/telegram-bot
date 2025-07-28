@@ -10,11 +10,30 @@ import { User } from "./database/schema";
 import { walletScene } from "./commands/wallet/scenes/generate";
 import { walletComposer } from "./commands/wallet/composers/manage";
 import { removeWallet } from "./commands/wallet/scenes/remove";
+import { Connection } from "@solana/web3.js";
+import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
+import { WebSocket } from "ws";
 
-const bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN as string);
+export const bot = new Telegraf<Scenes.WizardContext>(
+  process.env.BOT_TOKEN as string
+);
 const app = express();
 const port = process.env.PORT || 3000;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
+export const API_KEY = process.env.SHYFT_API_KEY as string;
+
+// Rpc connections
+export const connection = new Connection(
+  `https://rpc.shyft.to?api_key=${API_KEY}`,
+  "confirmed"
+);
+// export const connection = new Connection("http://127.0.0.1:8899", "confirmed");
+
+export const ws = new WebSocket(
+  `wss://devnet-rpc.shyft.to?api_key=tE9V9B6LBs1kjQGe`
+);
+
+// export const ws = new WebSocket("ws://127.0.0.1:8900");
 
 mongoose
   .connect(`${process.env.DATABASE_STRING}/my-telegram-bot`)
@@ -36,10 +55,6 @@ app.use("/snipe", snipeRouter);
 // any request to the bot will be forwarded here and thereby handled
 app.use(bot.webhookCallback("/bot"));
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
 // We have set the webhook route to be /bot
 bot.telegram.setWebhook(`${WEBHOOK_URL}/bot`);
 
@@ -53,6 +68,7 @@ bot.start(async (ctx) => {
     const userObj = {
       username,
       telegramId: id,
+      chatId: ctx.chat.id,
       firstName: first_name,
       lastName: last_name,
       language: language_code,
@@ -88,19 +104,22 @@ Here's what I can do:
 
   ctx.replyWithMarkdownV2(formattedWelcomeText, {
     reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "➕ Add Wallets", callback_data: "add_wallet" },
-          { text: "🔃 Generate Wallet", callback_data: "generate_wallet" },
-        ],
-        [{ text: "💼 Manage Wallets", callback_data: "manage_wallet" }],
-      ],
-      // keyboard: [
-      //   ["➕ Add Wallets", "💼 Manage Wallets"],
-      //   ["🔃 Generate Wallet", "⚙️ Settings"],
+      // inline_keyboard: [
+      //   [
+      //     { text: "➕ Add Wallets", callback_data: "add_wallet" },
+      //     { text: "🔃 Generate Wallet", callback_data: "generate_wallet" },
+      //   ],
+      //   [{ text: "💼 Manage Wallets", callback_data: "manage_wallet" }],
       // ],
-      // resize_keyboard: true,
-      // one_time_keyboard: false,
+      keyboard: [
+        ["➕ Add Wallets", "🔃 Generate Wallet"],
+        ["💼 Manage Wallets"],
+        ["2x token 🚀", "5x token 🚀"],
+        ["10x token 🚀"],
+        ["Withdraw 🏦"],
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: false,
     },
   });
 });
@@ -111,15 +130,19 @@ const stage = new Scenes.Stage<MyContext>([
   walletScene,
   addWallet,
   removeWallet,
+  fundWallet,
+  testFund,
 ]);
 
 // Register scenes to global middleware and session
 bot.use(session({ store: store as any }));
+// bot.use((ctx) => coinAnalyzer(ctx));
 bot.use(stage.middleware());
 bot.use(walletComposer);
 
 bot.command("wallet", async (ctx) => await ctx.scene.enter("walletScene"));
 bot.command("buy", async (ctx) => await ctx.scene.enter("buyScene"));
 bot.command("addwallet", async (ctx) => await ctx.scene.enter("addWallet"));
+bot.command("test", async (ctx) => await ctx.scene.enter("test"));
 
 app.listen(port, () => console.log(`Server is up and running on port ${port}`));

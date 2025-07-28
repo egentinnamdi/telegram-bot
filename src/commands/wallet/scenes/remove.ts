@@ -21,7 +21,7 @@ export const removeWallet = new Scenes.WizardScene<MyContext>(
 
         (ctx.scene.state as { walletName: string }).walletName = walletName;
         ctx.replyWithMarkdownV2(
-          `Are you sure you want to remove ${walletName}?`,
+          `If this wallet was not imported, removing it means losing all SOL in it\nAre you sure you want to remove ${walletName}?`,
           {
             reply_markup: {
               inline_keyboard: [
