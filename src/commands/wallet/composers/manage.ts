@@ -111,13 +111,13 @@ const manageWallet = async (ctx: Context) => {
   }
 
   const allUserWallets = wallets.map((item, index) =>
-    `${index + 1}. ${item.walletName}\n`.replaceAll(",", "")
+    `${index + 1}. ${item.walletName}\n`
   );
 
   const walletList = escapeMarkdownV2(`
 *💼 Your Linked Wallets*
 
-${allUserWallets.join(",")}
+${allUserWallets.join(",").replaceAll(",", "")}
 
 _You can add up to 5 wallets._
 
