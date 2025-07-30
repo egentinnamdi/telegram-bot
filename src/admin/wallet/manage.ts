@@ -92,7 +92,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 const allWallets = async (ctx: Context, type: string) => {
   const user = await User.findOne({ username: ctx.text });
 
-if(user === null){
+if(user === null && type === "user"){
    return ctx.reply("❌ User not found")
 }
 
