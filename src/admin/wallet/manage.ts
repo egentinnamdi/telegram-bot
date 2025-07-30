@@ -93,8 +93,7 @@ const allWallets = async (ctx: Context, type: string) => {
   const user = await User.findOne({ username: ctx.text });
 
 if(user === null){
-   ctx.reply("❌ User not found")
-   return ctx.scene.leave()
+   return ctx.reply("❌ User not found")
 }
 
   const wallets = await Wallet.find(
