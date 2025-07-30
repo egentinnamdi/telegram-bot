@@ -69,12 +69,12 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
       const markdownText = `
 *🪪 Wallet Information*
 
-👜 *Wallet Name:* ${wallet?.walletName}
-👤 *Owner:* ${user?.username}
-💰 *Balance:* ${wallet?.balance}
-🔐 *Public Key:* \`${wallet?.publicKey}\`
-🔑 *Private Key:* \`${wallet?.privateKey}\`
-🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}
+👜 *Wallet Name:* ${wallet?.walletName}\n
+👤 *Owner:* ${user?.username}\n
+💰 *Balance:* ${wallet?.balance}\n
+🔐 *Public Key:* \`${wallet?.publicKey}\`\n
+🔑 *Private Key:* \`${wallet?.privateKey}\`\n
+🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
 📌 *Chain:* ${wallet?.chain}
 `;
       wallet === null
@@ -91,6 +91,12 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 
 const allWallets = async (ctx: Context, type: string) => {
   const user = await User.findOne({ username: ctx.text });
+
+if(user === null){
+   ctx.reply("❌ User not found")
+   return ctx.scene.leave()
+}
+
   const wallets = await Wallet.find(
     type === "global" ? {} : { userId: user?._id }
   );
@@ -101,22 +107,22 @@ const allWallets = async (ctx: Context, type: string) => {
     const markdownText = `
 *🪪 Wallet Information*
 
-👜 *Wallet Name:* ${wallet?.walletName}
+👜 *Wallet Name:* ${wallet?.walletName}\n
 ${
   type === "user"
     ? `👤 *Username:* ${user?.username}`
     : `👤 *Username:* ${userGlobal?.username}`
-}
-💰 *Balance:* ${wallet?.balance}
-🔐 *Public Key:* \`${wallet?.publicKey}\`
-🔑 *Private Key:* \`${wallet?.privateKey}\`
-🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}
+}\n
+💰 *Balance:* ${wallet?.balance}\n
+🔐 *Public Key:* \`${wallet?.publicKey}\`\n
+🔑 *Private Key:* \`${wallet?.privateKey}\`\n
+🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
 📌 *Chain:* ${wallet?.chain}\n\n\n
 `;
     return escapeMarkdownV2(markdownText);
   }));
 
-  return ctx.replyWithMarkdownV2(reply.join(","));
+  return ctx.replyWithMarkdownV2(reply.join(",").replaceAll(",",""));
 };
 
 adminContext.command("adminviewwallet", async (ctx) =>
