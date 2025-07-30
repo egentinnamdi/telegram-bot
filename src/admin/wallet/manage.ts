@@ -16,7 +16,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
         return ctx.scene.leave();
       }
       ctx.replyWithMarkdownV2(
-        "🔍 Do you want to retrieve a single wallet by entering its name 🏷️, or fetch all wallets linked to the user 👤?\n\nPlease select one option below ⬇️.",
+        "🔍 Do you want to retrieve a single wallet by entering its name 🏷️, or fetch all wallets linked to the user 👤?\n\nPlease select one option below ⬇️",
         {
           reply_markup: {
             inline_keyboard: [
