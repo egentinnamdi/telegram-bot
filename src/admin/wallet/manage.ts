@@ -122,6 +122,11 @@ ${
 adminContext.command("adminviewwallet", async (ctx) =>
   ctx.scene.enter("getUserWallet")
 );
-adminContext.command("adminallwallet", async (ctx) =>
-  allWallets(ctx, "global")
-);
+adminContext.command("adminallwallet", async (ctx) => {
+  const user = await User.findOne({ telegramId: ctx.from?.id });
+  if (!user?.isAdmin) {
+    ctx.reply("❌ This command is reserved only for Admins");
+    return ctx.scene.leave();
+  }
+  return allWallets(ctx, "global");
+});
