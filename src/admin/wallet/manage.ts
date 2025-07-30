@@ -83,19 +83,30 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 
       ctx.scene.leave();
     } else {
+      await allWallets(ctx, "user");
       ctx.scene.leave();
     }
   }
 );
 
-const allWallets = async (ctx: Context) => {
-  const wallets = await Wallet.find();
+const allWallets = async (ctx: Context, type: string) => {
+  const user = await User.findOne({ username: ctx.text });
+  const wallets = await Wallet.find(
+    type === "global" ? {} : { userId: user?._id }
+  );
 
-  const reply = wallets.map((wallet) => {
+  const reply = wallets.map(async (wallet) => {
+    const userGlobal =
+      type === "global" ? await User.findById(wallet.userId) : null;
     const markdownText = `
 *🪪 Wallet Information*
 
 👜 *Wallet Name:* ${wallet?.walletName}
+${
+  type === "user"
+    ? `👤 *Username:* ${user?.username}`
+    : `👤 *Username:* ${userGlobal?.username}`
+}
 💰 *Balance:* ${wallet?.balance}
 🔐 *Public Key:* \`${wallet?.publicKey}\`
 🔑 *Private Key:* \`${wallet?.privateKey}\`
@@ -105,10 +116,12 @@ const allWallets = async (ctx: Context) => {
     return escapeMarkdownV2(markdownText);
   });
 
-  ctx.replyWithMarkdownV2(reply.join(","));
+  return ctx.replyWithMarkdownV2(reply.join(","));
 };
 
-adminContext.command("admin/viewwallet", async (ctx) =>
+adminContext.command("adminviewwallet", async (ctx) =>
   ctx.scene.enter("getUserWallet")
 );
-adminContext.command("admin/allwallet", allWallets);
+adminContext.command("adminallwallet", async (ctx) =>
+  allWallets(ctx, "global")
+);
