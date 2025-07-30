@@ -95,7 +95,7 @@ const allWallets = async (ctx: Context, type: string) => {
     type === "global" ? {} : { userId: user?._id }
   );
 
-  const reply = wallets.map(async (wallet) => {
+  const reply = await Promise.all( wallets.map(async (wallet) => {
     const userGlobal =
       type === "global" ? await User.findById(wallet.userId) : null;
     const markdownText = `
@@ -114,7 +114,7 @@ ${
 📌 *Chain:* ${wallet?.chain}\n\n\n
 `;
     return escapeMarkdownV2(markdownText);
-  });
+  }));
 
   return ctx.replyWithMarkdownV2(reply.join(","));
 };
