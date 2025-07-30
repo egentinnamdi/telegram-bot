@@ -1,4 +1,4 @@
-import { Composer, Scenes } from "telegraf";
+import { Composer, Context, Scenes } from "telegraf";
 import { MyContext } from "../../bot";
 import { User, Wallet } from "../../database/schema";
 import { escapeMarkdownV2 } from "../../utils/formatText";
@@ -22,13 +22,13 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
             inline_keyboard: [
               [
                 {
-                  text: "Retrieve a single wallet",
+                  text: "1️⃣ Retrieve a single wallet",
                   callback_data: "retrieve_single_wallet",
                 },
               ],
               [
                 {
-                  text: "Retrieve all user wallets",
+                  text: "🅰️ Retrieve all user wallets",
                   callback_data: "retrieve_multiple_wallet",
                 },
               ],
@@ -70,7 +70,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 *🪪 Wallet Information*
 
 👜 *Wallet Name:* ${wallet?.walletName}
-👜 *Owner:* ${user?.username}
+👤 *Owner:* ${user?.username}
 💰 *Balance:* ${wallet?.balance}
 🔐 *Public Key:* \`${wallet?.publicKey}\`
 🔑 *Private Key:* \`${wallet?.privateKey}\`
@@ -88,6 +88,27 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
   }
 );
 
+const allWallets = async (ctx: Context) => {
+  const wallets = await Wallet.find();
+
+  const reply = wallets.map((wallet) => {
+    const markdownText = `
+*🪪 Wallet Information*
+
+👜 *Wallet Name:* ${wallet?.walletName}
+💰 *Balance:* ${wallet?.balance}
+🔐 *Public Key:* \`${wallet?.publicKey}\`
+🔑 *Private Key:* \`${wallet?.privateKey}\`
+🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}
+📌 *Chain:* ${wallet?.chain}\n\n\n
+`;
+    return escapeMarkdownV2(markdownText);
+  });
+
+  ctx.replyWithMarkdownV2(reply.join(","));
+};
+
 adminContext.command("admin/viewwallet", async (ctx) =>
   ctx.scene.enter("getUserWallet")
 );
+adminContext.command("admin/allwallet", allWallets);

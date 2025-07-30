@@ -24,17 +24,17 @@ const WEBHOOK_URL = process.env.WEBHOOK_URL;
 export const API_KEY = process.env.SHYFT_API_KEY as string;
 
 // Rpc connections
-// export const connection = new Connection(
-//   `https://rpc.shyft.to?api_key=${API_KEY}`,
-//   "confirmed"
-// );
-export const connection = new Connection("http://127.0.0.1:8899", "confirmed");
+export const connection = new Connection(
+  `https://rpc.shyft.to?api_key=${API_KEY}`,
+  "confirmed"
+);
+// export const connection = new Connection("http://127.0.0.1:8899", "confirmed");
 
-// export const ws = new WebSocket(
-//   `wss://devnet-rpc.shyft.to?api_key=tE9V9B6LBs1kjQGe`
-// );
+export const ws = new WebSocket(
+  `wss://devnet-rpc.shyft.to?api_key=tE9V9B6LBs1kjQGe`
+);
 
-export const ws = new WebSocket("ws://127.0.0.1:8900");
+// export const ws = new WebSocket("ws://127.0.0.1:8900");
 
 mongoose
   .connect(`${process.env.DATABASE_STRING}/my-telegram-bot`)
