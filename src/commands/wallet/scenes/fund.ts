@@ -21,6 +21,7 @@ export const fundWallet = new Scenes.WizardScene<MyContext>(
 
       // Before leaving scene, subscribe to websocket event
       await watchAccountChanges(publicKey);
+      console.log("Websocket event subscribed");
 
       // Leave
       ctx.scene.leave();
@@ -46,9 +47,6 @@ export const testFund = new Scenes.WizardScene<MyContext>(
         const publicKey = new PublicKey(wallet.publicKey);
 
         await connection.requestAirdrop(publicKey, 1 * LAMPORTS_PER_SOL);
-
-        const balance = await connection.getBalance(publicKey);
-        // console.log(balance);
 
         // Give Feedback and leave scene
         ctx.reply(

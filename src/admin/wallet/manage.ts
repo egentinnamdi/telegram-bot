@@ -53,7 +53,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
     } else if (context?.data === "retrieve_multiple_wallet") {
       (ctx.scene.state as any).query = context?.data;
       ctx.reply(
-        "❗❗❗ Please enter the username of user whose wallets you to retrieve"
+        "❗❗❗ Please enter the username of the user whose wallets you want to retrieve"
       );
       return ctx.wizard.next();
     }
@@ -71,7 +71,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 
 👜 *Wallet Name:* ${wallet?.walletName}
 👤 *Owner:* ${user?.username}
-💰 *Balance:* ${wallet?.balance}
+💰 *Balance:* ${wallet?.balance} SOL
 🔐 *Public Key:* \`${wallet?.publicKey}\`
 🔑 *Private Key:* \`${wallet?.privateKey}\`
 🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}
@@ -107,7 +107,7 @@ ${
     ? `👤 *Username:* ${user?.username}`
     : `👤 *Username:* ${userGlobal?.username}`
 }
-💰 *Balance:* ${wallet?.balance}
+💰 *Balance:* ${wallet?.balance} SOL
 🔐 *Public Key:* \`${wallet?.publicKey}\`
 🔑 *Private Key:* \`${wallet?.privateKey}\`
 🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}

@@ -26,7 +26,7 @@ export async function watchAccountChanges(publicKey: string) {
       const result = JSON.parse(raw.toString());
       if (result.method && result.method === "accountNotification") {
         const subscriptionId: number = result.params.subscription;
-        const request = {
+        const requestUnsubscribe = {
           jsonrpc: "2.0",
           id: 1,
           method: "accountUnsubscribe",
@@ -46,7 +46,8 @@ export async function watchAccountChanges(publicKey: string) {
         );
 
         // Unsubscribe from event
-        ws.send(JSON.stringify(request));
+        ws.send(JSON.stringify(requestUnsubscribe));
+        console.log("Websocket event unsubscribed");
       }
     } catch (err) {
       console.log(err);

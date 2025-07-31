@@ -14,7 +14,7 @@ export const userSchema = new Schema({
 export const User = mongoose.model("User", userSchema);
 
 // Wallet Document
-const walletSchema = new Schema({
+export const walletSchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

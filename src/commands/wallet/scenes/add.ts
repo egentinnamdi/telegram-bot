@@ -5,6 +5,7 @@ import { connection, MyContext } from "../../../bot";
 import { User, userSchema, Wallet } from "../../../database/schema";
 import { InferSchemaType, Types } from "mongoose";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
+import { checkWalletName } from "../../../utils/helper";
 
 type WalletState = {
   name: string;
@@ -35,6 +36,12 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
 
   // Step Two - Import Wallet Private Key
   async (ctx) => {
+    // Check if wallet name is valid
+    const isWalletNameValid = await checkWalletName(ctx, ctx.text as string);
+    if (!isWalletNameValid) {
+      return ctx.scene.leave();
+    }
+
     (ctx.scene.state as WalletState).name = ctx.text ?? "";
     ctx.reply("🔐 To import your wallet, Enter it's private key");
     return ctx.wizard.next();

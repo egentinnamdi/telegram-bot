@@ -4,6 +4,7 @@ import { connection, MyContext } from "../../../bot";
 import { User, Wallet } from "../../../database/schema";
 import mongoose from "mongoose";
 import base58 from "bs58";
+import { checkWalletName } from "../../../utils/helper";
 
 export const walletScene = new Scenes.WizardScene<MyContext>(
   "walletScene",
@@ -41,6 +42,11 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
   },
   async (ctx) => {
     const walletName = ctx.text;
+    // Check if wallet name is valid
+    const isWalletNameValid = await checkWalletName(ctx, walletName as string);
+    if (!isWalletNameValid) {
+      return ctx.scene.leave();
+    }
 
     // Create wallet
     const keypair = Keypair.generate();

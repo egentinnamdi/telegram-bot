@@ -1,4 +1,4 @@
-import { Scenes, session, Telegraf } from "telegraf";
+import { Context, Scenes, session, Telegraf } from "telegraf";
 import "dotenv/config";
 import { buyScene } from "./scenes/buy";
 import { Mongo } from "@telegraf/session/mongodb";
@@ -14,6 +14,7 @@ import { Connection } from "@solana/web3.js";
 import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
 import { WebSocket } from "ws";
 import { adminContext, getUserWalletScene } from "./admin/wallet/manage";
+import { sniperComposer } from "./commands/sniper/sniper";
 
 export const bot = new Telegraf<Scenes.WizardContext>(
   process.env.BOT_TOKEN as string
@@ -30,9 +31,7 @@ export const connection = new Connection(
 );
 // export const connection = new Connection("http://127.0.0.1:8899", "confirmed");
 
-export const ws = new WebSocket(
-  `wss://devnet-rpc.shyft.to?api_key=tE9V9B6LBs1kjQGe`
-);
+export const ws = new WebSocket(`wss://rpc.shyft.to?api_key=${API_KEY}`);
 
 // export const ws = new WebSocket("ws://127.0.0.1:8900");
 
@@ -82,22 +81,23 @@ bot.start(async (ctx) => {
   }
 
   const formattedWelcomeText = `
-*Welcome ${first_name || "there"}!* 👋 
+🤖 Welcome to AlphaSniper Bot — your ultimate on-chain trading assistant.
 
-I'm your friendly assistant bot 🤖.
-Here's what I can do:
+I’m here to make your trading faster, smarter, and safer.
+From sniping entries to securing exits, I do the heavy lifting so you can focus on profits.
 
-1. ℹ️ *Updates* - Give you live update about market conditions and signal on when to enter a trade.
+⚡ What I do for you:
 
-2. 📈 *Trade* - I can automatically handle trades for you, buy coins immediately they launch and sell once the conditions are right.
+• 🚀 Auto-buy & auto-sell tokens at lightning speed
 
-3. 👛 *Wallet* - You can store your wallet information here so I can help you with your trades.
+• 🛡️ Detect rug pulls before they happen
 
-4. ⚙️ *Settings* - You can also change and update your user preferences here.
+• 📈 Scan for optimal entry and exit points
 
-5. 🔍 *Search* - You can search for any token on the market and get real-time information about it.
+• 📊 Manage risk like a pro
 
-👉 Please choose an option below to get started:
+Tap into automation. Trade like an alpha.
+Ready to get started? Just tell me what you need — I’m here to serve.
         `
     .replaceAll(".", "\\.")
     .replaceAll("-", "\\-")
@@ -117,13 +117,27 @@ Here's what I can do:
         ["💼 Manage Wallets"],
         ["2x token 🚀", "5x token 🚀"],
         ["10x token 🚀"],
-        ["Withdraw 🏦"],
+        ["Withdraw 🏦", "Help 🆘"],
       ],
       resize_keyboard: true,
       one_time_keyboard: false,
     },
   });
 });
+
+// Help
+const handleHelp = async (ctx: Context) => {
+  ctx.reply(
+    `
+🧑‍💻  Help Desk:
+[@Ian_onSol001](https://t.me/Ian_onSol001)
+`,
+    { parse_mode: "Markdown" }
+  );
+};
+
+bot.help(handleHelp);
+bot.hears("Help 🆘", handleHelp);
 
 // Stage scenes
 const stage = new Scenes.Stage<MyContext>([
@@ -142,6 +156,7 @@ bot.use(session({ store: store as any }));
 bot.use(stage.middleware());
 bot.use(walletComposer);
 bot.use(adminContext);
+bot.use(sniperComposer);
 
 bot.command("wallet", async (ctx) => await ctx.scene.enter("walletScene"));
 bot.command("buy", async (ctx) => await ctx.scene.enter("buyScene"));
