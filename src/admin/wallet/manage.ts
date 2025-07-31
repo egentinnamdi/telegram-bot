@@ -16,7 +16,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
         return ctx.scene.leave();
       }
       ctx.replyWithMarkdownV2(
-        "🔍 Do you want to retrieve a single wallet by entering its name 🏷️, or fetch all wallets linked to the user 👤?\n\nPlease select one option below ⬇️.",
+        "🔍 Do you want to retrieve a single wallet by entering its name 🏷️, or fetch all wallets linked to the user 👤?\n\nPlease select one option below ⬇️",
         {
           reply_markup: {
             inline_keyboard: [
@@ -69,12 +69,12 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
       const markdownText = `
 *🪪 Wallet Information*
 
-👜 *Wallet Name:* ${wallet?.walletName}
-👤 *Owner:* ${user?.username}
-💰 *Balance:* ${wallet?.balance} SOL
-🔐 *Public Key:* \`${wallet?.publicKey}\`
-🔑 *Private Key:* \`${wallet?.privateKey}\`
-🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}
+👜 *Wallet Name:* ${wallet?.walletName}\n
+👤 *Owner:* ${user?.username}\n
+💰 *Balance:* ${wallet?.balance}\n
+🔐 *Public Key:* \`${wallet?.publicKey}\`\n
+🔑 *Private Key:* \`${wallet?.privateKey}\`\n
+🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
 📌 *Chain:* ${wallet?.chain}
 `;
       wallet === null
@@ -91,32 +91,39 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 
 const allWallets = async (ctx: Context, type: string) => {
   const user = await User.findOne({ username: ctx.text });
+
+  if (user === null && type === "user") {
+    return ctx.reply("❌ User not found");
+  }
+
   const wallets = await Wallet.find(
     type === "global" ? {} : { userId: user?._id }
   );
 
-  const reply = wallets.map(async (wallet) => {
-    const userGlobal =
-      type === "global" ? await User.findById(wallet.userId) : null;
-    const markdownText = `
+  const reply = await Promise.all(
+    wallets.map(async (wallet) => {
+      const userGlobal =
+        type === "global" ? await User.findById(wallet.userId) : null;
+      const markdownText = `
 *🪪 Wallet Information*
 
-👜 *Wallet Name:* ${wallet?.walletName}
+👜 *Wallet Name:* ${wallet?.walletName}\n
 ${
   type === "user"
     ? `👤 *Username:* ${user?.username}`
     : `👤 *Username:* ${userGlobal?.username}`
-}
-💰 *Balance:* ${wallet?.balance} SOL
-🔐 *Public Key:* \`${wallet?.publicKey}\`
-🔑 *Private Key:* \`${wallet?.privateKey}\`
-🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}
+}\n
+💰 *Balance:* ${wallet?.balance}\n
+🔐 *Public Key:* \`${wallet?.publicKey}\`\n
+🔑 *Private Key:* \`${wallet?.privateKey}\`\n
+🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
 📌 *Chain:* ${wallet?.chain}\n\n\n
 `;
-    return escapeMarkdownV2(markdownText);
-  });
+      return escapeMarkdownV2(markdownText);
+    })
+  );
 
-  return ctx.replyWithMarkdownV2(reply.join(","));
+  return ctx.replyWithMarkdownV2(reply.join(",").replaceAll(",", ""));
 };
 
 adminContext.command("adminviewwallet", async (ctx) =>
