@@ -72,7 +72,7 @@ router.post("/webhook", async (req, res) => {
             const targetPrice =
               (launchPrice ?? currentPrice) * activeWallet.tokenMultiplier;
 
-            if (currentPrice === targetPrice) {
+            if (currentPrice >= targetPrice) {
               const newBalance = totalBoughtToken * currentPrice;
 
               // Store new balance to db and deactivate isActive
