@@ -71,7 +71,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
 
 👜 *Wallet Name:* ${wallet?.walletName}\n
 👤 *Owner:* ${user?.username}\n
-💰 *Balance:* ${wallet?.balance}\n
+💰 *Balance:* ${wallet?.balance}\n SOL
 🔐 *Public Key:* \`${wallet?.publicKey}\`\n
 🔑 *Private Key:* \`${wallet?.privateKey}\`\n
 🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
@@ -113,7 +113,7 @@ ${
     ? `👤 *Username:* ${user?.username}`
     : `👤 *Username:* ${userGlobal?.username}`
 }\n
-💰 *Balance:* ${wallet?.balance}\n
+💰 *Balance:* ${wallet?.balance}\n SOL
 🔐 *Public Key:* \`${wallet?.publicKey}\`\n
 🔑 *Private Key:* \`${wallet?.privateKey}\`\n
 🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
