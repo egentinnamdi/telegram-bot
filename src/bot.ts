@@ -22,18 +22,16 @@ export const bot = new Telegraf<Scenes.WizardContext>(
 const app = express();
 const port = process.env.PORT || 3000;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
-export const API_KEY = process.env.SHYFT_API_KEY as string;
+export const API_KEY = process.env.HELIUS_API_KEY as string;
 
-// Rpc connections
 export const connection = new Connection(
-  `https://rpc.shyft.to?api_key=${API_KEY}`,
+  `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`,
   "confirmed"
 );
-// export const connection = new Connection("http://127.0.0.1:8899", "confirmed");
 
-export const ws = new WebSocket(`wss://rpc.shyft.to?api_key=${API_KEY}`);
-
-// export const ws = new WebSocket("ws://127.0.0.1:8900");
+export const ws = new WebSocket(
+  `wss://mainnet.helius-rpc.com/?api-key=${API_KEY}`
+);
 
 mongoose
   .connect(`${process.env.DATABASE_STRING}/my-telegram-bot`)
@@ -77,7 +75,7 @@ bot.start(async (ctx) => {
     };
 
     const createUser = await User.create(userObj);
-    console.log(createUser);
+    // console.log(createUser);
   }
 
   const formattedWelcomeText = `

@@ -17,51 +17,32 @@ export async function initiateSnipeProcess(
       "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
       {
         encoding: "base64",
-        filters: [{ dataSize: 80 }],
+        filters: [{ dataSize: 5 }],
       },
     ],
   };
 
+  // Subscribe to the program
   ws.send(JSON.stringify(request));
 
+  // Handle Subscription Notification
   ws.on("message", async (raw) => {
     try {
       const data = JSON.parse(raw.toString());
 
-      // Get program accounts
-      let programId = new PublicKey(
-        "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
-      );
+      // if (data.method && data.method === "programNotification") {
+      // const subscriptionId: number = data.params.subscription;
+      // const unsubscribe = {
+      //   jsonrpc: "2.0",
+      //   id: 1,
+      //   method: "programUnsubscribe",
+      //   params: [subscriptionId],
+      // };
 
-      let config: GetProgramAccountsConfig = {
-        commitment: "finalized",
-        filters: [
-          {
-            dataSize: 17,
-          },
-          {
-            memcmp: {
-              bytes: "3Mc6vR",
-              offset: 4,
-            },
-          },
-        ],
-      };
-      console.log(await connection.getProgramAccounts(programId, config));
-
-      if (data.method && data.method === "programNotification") {
-        const subscriptionId: number = data.params.subscription;
-        const unsubscribe = {
-          jsonrpc: "2.0",
-          id: 1,
-          method: "programUnsubscribe",
-          params: [subscriptionId],
-        };
-
-        // Analyze Data and run through checks, then buy immediately
-        console.log(data);
-        // ws.send(JSON.stringify(unsubscribe));
-      }
+      // Analyze Data and run through checks, then buy immediately
+      console.log(data);
+      // ws.send(JSON.stringify(unsubscribe));
+      // }
     } catch (err) {
       console.log(err);
     }

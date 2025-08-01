@@ -1,7 +1,6 @@
 import { Composer, Context } from "telegraf";
 import { MyContext } from "../../bot";
 import { User, Wallet } from "../../database/schema";
-import { initiateSnipeProcess } from "../../services/program.service";
 
 export const sniperComposer = new Composer<MyContext>();
 
@@ -28,21 +27,27 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
 
     if (checkedWallets.length === 0) {
       return ctx.reply(
-        `❌ You don't have any wallet with at least ${minimumBalance} sols to initiate this process\n\nPlease fund your wallet to at least ${minimumBalance} sols and try again`
+        `❌ You don't have any wallet with at least ${minimumBalance} sol to initiate this process\n\nPlease fund your wallet to at least ${minimumBalance} sols and try again`
       );
     }
 
     // Wallet to initiate trade with
     const walletToTradeWIth = checkedWallets[0];
 
-    // Initiate Snipe Process, pass wallet to trade with hand full control to bot
-    await initiateSnipeProcess(walletToTradeWIth);
+    // Check if trade is already Active
+    const tradeWallet = await Wallet.findById(walletToTradeWIth._id);
 
-    return ctx.reply(`
-✅ Snipe Initiated Successfully!
-Your snipe has been initiated and is now actively monitoring tokens. ⏳
-You'll be notified once execution is triggered.
-`);
+    if (tradeWallet?.isActive) {
+      return ctx.reply("🔃 Trading still in progress");
+    }
+
+    // Activate snipe on funded wallet
+    await Wallet.findByIdAndUpdate(walletToTradeWIth._id, {
+      isActive: true,
+      tokenMultiplier: minimumBalance,
+    });
+
+    return ctx.reply(`✅ Trading initiated successfully!.`);
   } catch (err) {
     console.log(err);
     return ctx.reply("❌ There was an error, please try again");
