@@ -69,7 +69,7 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
           } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
         );
       }
-    }, 900000);
+    }, 20000);
 
     return ctx.reply(`✅ Trading initiated successfully!.`);
   } catch (err) {
