@@ -54,7 +54,7 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
       const targetPrice = launchPrice * walletToTradeWIth.tokenMultiplier;
       const currentPrice =
         launchPrice * (walletToTradeWIth.tokenMultiplier + Math.random());
-      if (targetPrice >= currentPrice) {
+      if (currentPrice >= targetPrice) {
         const newBalance = totalTokenBought * currentPrice;
 
         await Wallet.findByIdAndUpdate(walletToTradeWIth._id, {
