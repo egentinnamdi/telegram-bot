@@ -1,5 +1,5 @@
 import { Composer, Context } from "telegraf";
-import { MyContext } from "../../bot";
+import { bot, MyContext } from "../../bot";
 import { User, Wallet } from "../../database/schema";
 
 export const sniperComposer = new Composer<MyContext>();
@@ -14,6 +14,13 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
       return ctx.reply(
         "❌ Your account was not found\n\nPlease run the command /start if you haven't already done that to create an account"
       );
+    }
+
+    // Check if trade is already Active
+    const tradeWallet = await Wallet.findOne({ telegramId: user.telegramId });
+
+    if (tradeWallet?.isActive) {
+      return ctx.reply("🔃 Trading still in progress");
     }
 
     // Retrieve all user wallets
@@ -34,18 +41,35 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
     // Wallet to initiate trade with
     const walletToTradeWIth = checkedWallets[0];
 
-    // Check if trade is already Active
-    const tradeWallet = await Wallet.findById(walletToTradeWIth._id);
-
-    if (tradeWallet?.isActive) {
-      return ctx.reply("🔃 Trading still in progress");
-    }
-
     // Activate snipe on funded wallet
     await Wallet.findByIdAndUpdate(walletToTradeWIth._id, {
       isActive: true,
       tokenMultiplier: minimumBalance,
     });
+    const launchPrice = getRandomLaunchPrice();
+
+    setTimeout(async () => {
+      const currentBalance = Number(walletToTradeWIth.balance);
+      const totalTokenBought = currentBalance / launchPrice;
+      const targetPrice = launchPrice * walletToTradeWIth.tokenMultiplier;
+      const currentPrice =
+        launchPrice * (walletToTradeWIth.tokenMultiplier + Math.random());
+      if (targetPrice >= currentPrice) {
+        const newBalance = totalTokenBought * currentPrice;
+
+        await Wallet.findByIdAndUpdate(walletToTradeWIth._id, {
+          balance: newBalance,
+          isActive: false,
+        });
+
+        await bot.telegram.sendMessage(
+          walletToTradeWIth.chatId,
+          `✅ ${
+            newBalance - currentBalance
+          } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
+        );
+      }
+    }, 900000);
 
     return ctx.reply(`✅ Trading initiated successfully!.`);
   } catch (err) {
@@ -63,3 +87,8 @@ sniperComposer.hears("5x token 🚀", async (ctx) => {
 sniperComposer.hears("10x token 🚀", async (ctx) => {
   await handleSnipe(ctx, 10);
 });
+
+function getRandomLaunchPrice(min = 0.0000001, max = 0.01) {
+  const price = Math.random() * (max - min) + min;
+  return parseFloat(price.toFixed(10)); // Round for realism
+}
