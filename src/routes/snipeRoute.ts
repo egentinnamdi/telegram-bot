@@ -1,10 +1,12 @@
 import express from "express";
-import { Meta, Wallet } from "../database/schema";
-import { bot } from "../bot";
+import { Meta, Wallet, walletSchema } from "../database/schema";
+import { agenda, bot } from "../bot";
+import { DEX_ENDPOINT } from "../commands/sniper/analyzer";
+import mongoose, { InferSchemaType } from "mongoose";
 
 export const router = express.Router();
 
-type TokenPriceType = Array<{
+export type TokenPriceType = Array<{
   chainId: string;
   dexId: string;
   url: string;
@@ -29,10 +31,13 @@ type TokenPriceType = Array<{
     };
   };
   volume: {
-    ANY_ADDITIONAL_PROPERTY: string;
+    h24: number;
+    h6: number;
+    h1: number;
+    m5: number;
   };
   priceChange: {
-    ANY_ADDITIONAL_PROPERTY: string;
+    h24: number;
   };
   liquidity: {
     usd: number;
@@ -44,6 +49,8 @@ type TokenPriceType = Array<{
   pairCreatedAt: number;
   info: {
     imageUrl: string;
+    header: string;
+    openGraph: string;
     websites: {
       url: string;
     }[];
@@ -80,100 +87,153 @@ type TokenPriceType = Array<{
 
 router.post("/webhook", async (req, res) => {
   try {
-    const DEXSCREENER_ENDPOINT =
-      "https://api.dexscreener.com/token-pairs/v1/solana";
     // Data
-    // const event = req.body[0];
+    const event = req.body[0];
+    if (event && event.type === "CREATE_POOL") {
+      const newlyLaunchedToken = event.tokenTransfers[0].mint;
 
-    // if (event && event.type === "CREATE_POOL") {
-    // const newlyLaunchedToken = event.tokenTransfers[0].mint;
-    const newlyLaunchedToken = "6TarfrgpWS7zJN8eeJqzsYm1GfDMzouxePffy71aTT9f";
-    // Activated wallets
-    const activatedWallets = await Wallet.find({ isActive: true });
-    let isFetching = false;
-    console.log(newlyLaunchedToken);
-    setInterval(async () => {
-      if (isFetching) return;
-      isFetching = true;
-      try {
-        const response = await fetch(
-          `https://api.dexscreener.com/token-pairs/v1/solana/${newlyLaunchedToken}`,
-          {
-            method: "GET",
-            headers: {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-              Accept: "*/*",
-            },
-          }
-        );
+      // Check if token exists first
+      const existingToken = await Meta.findOne({
+        tokenAddress: newlyLaunchedToken,
+      });
 
-        const result = (await response.json()) as TokenPriceType;
-        const filtered = result.filter((item) => item.dexId === "raydium")[0];
+      if (!existingToken) {
+        // Store token immediately
+        await Meta.create({
+          tokenAddress: newlyLaunchedToken,
+        });
+      }
 
-        activatedWallets.map(async (activeWallet) => {
-          const launchPrice = (
-            await Meta.findOne({ telegramId: activeWallet.telegramId })
-          )?.launchPrice;
+      console.log(newlyLaunchedToken);
 
-          // Price not equal to 0, which means trade is currently going on
-          if (launchPrice !== 0) {
-            return;
-          }
+      const tokens = await Meta.find();
 
-          const currentPrice = +filtered.priceNative;
+      tokens.map((token) => {
+        let isFetching = false;
 
-          if (!launchPrice)
-            await Meta.create({
-              launchPrice: Number(currentPrice),
-              telegramId: activeWallet.telegramId,
-            });
+        agenda.define(`checkPrice-${token.tokenAddress}`, async (job, done) => {
+          // Find active trades
+          if (isFetching) return;
+          isFetching = true;
 
-          const currentBalance = Number(activeWallet.balance);
-          const totalBoughtToken =
-            (launchPrice ?? currentPrice) * currentBalance;
-          const targetPrice =
-            (launchPrice ?? currentPrice) * activeWallet.tokenMultiplier;
-
-          console.log(currentPrice);
-
-          if (currentPrice >= targetPrice) {
-            const newBalance = totalBoughtToken * currentPrice;
-
-            // Store new balance to db and deactivate isActive
-            await Wallet.findByIdAndUpdate(activeWallet._id, {
-              balance: newBalance,
-              isActive: false,
-            });
-
-            // Set launch Price to 0
-            await Meta.findOneAndUpdate(
-              { telegramId: activeWallet.telegramId },
+          try {
+            const response = await fetch(
+              `${DEX_ENDPOINT}/${token.tokenAddress}`,
               {
-                launchPrice: 0,
+                method: "GET",
+                headers: {
+                  Accept: "*/*",
+                },
               }
             );
 
-            // Send Notification to user
-            await bot.telegram.sendMessage(
-              activeWallet.chatId,
-              `✅ ${
-                newBalance - currentBalance
-              } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
-            );
-          }
-          return;
-        });
-      } catch (err) {
-        console.log(err);
-      } finally {
-        isFetching = false;
-      }
-    }, 5000);
+            const result = (await response.json()) as TokenPriceType;
 
-    // const stillActive = activatedWallets.filter(
-    //   (item) => item.isActive === true
-    // );
-    // }
+            const filtered = result.filter(
+              (item) => item.dexId === "raydium"
+            )[0];
+            console.log(filtered);
+
+            if (filtered === undefined) {
+              return;
+            }
+            // Update token name
+            await Meta.findByIdAndUpdate(token._id, {
+              tokenName: filtered.baseToken.name,
+              createdAt: new Date(filtered.pairCreatedAt * 1000),
+            });
+
+            const currentPrice = +filtered?.priceNative;
+
+            // Set launch price
+            if (!token.launchPrice) {
+              await Meta.findByIdAndUpdate(token._id, {
+                launchPrice: currentPrice,
+              });
+            }
+
+            // Get launch price
+            const launchPrice = (await Meta.findById(token._id))?.launchPrice;
+            if (!launchPrice) return;
+
+            let tradingWallets: Array<
+              InferSchemaType<typeof walletSchema> & {
+                _id: mongoose.Types.ObjectId;
+              }
+            >;
+
+            const percentagePriceIncrease =
+              ((currentPrice - launchPrice) / launchPrice) * 100;
+
+            if (percentagePriceIncrease > 10) {
+              tradingWallets = await Wallet.find({
+                $and: [
+                  { isActive: true },
+                  { isTrading: true },
+                  { tokenTraded: token.tokenAddress },
+                ],
+              });
+            } else {
+              tradingWallets = await Wallet.find({
+                $or: [
+                  {
+                    $and: [{ isActive: true }, { isTrading: false }],
+                  },
+                  {
+                    $and: [{ isActive: true }, { isTrading: true }],
+                  },
+                ],
+              });
+            }
+
+            // Get Active but not yet trading wallets
+
+            tradingWallets.map(async (activeWallet) => {
+              // Price not equal to 0, which means trade is currently going on
+              const currentBalance = Number(activeWallet.balance);
+              const totalBoughtToken = currentBalance / launchPrice;
+              const targetPrice = launchPrice * activeWallet.tokenMultiplier;
+
+              // After Buying coin, set trading to true
+              if (!activeWallet.isTrading) {
+                await Wallet.findByIdAndUpdate(activeWallet._id, {
+                  isTrading: true,
+                  tokenTraded: token.tokenAddress,
+                });
+              }
+
+              if (currentPrice >= targetPrice) {
+                const newBalance = totalBoughtToken * currentPrice;
+
+                // Store new balance to db and deactivate isActive
+                await Wallet.findByIdAndUpdate(activeWallet._id, {
+                  balance: newBalance,
+                  isActive: false,
+                  isTrading: false,
+                });
+
+                // Send Notification to user
+                await bot.telegram.sendMessage(
+                  activeWallet.chatId,
+                  `✅ ${
+                    newBalance - currentBalance
+                  } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
+                );
+              }
+            });
+          } catch (err) {
+            console.log(err);
+          } finally {
+            isFetching = false;
+            done();
+          }
+        });
+
+        if (token.tokenAddress) {
+          agenda.every("5 seconds", `checkPrice-${token.tokenAddress}`);
+        }
+      });
+    }
   } catch (err) {
     console.error("Webhook error:", err);
   }

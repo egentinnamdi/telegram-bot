@@ -6,7 +6,7 @@ import express from "express";
 import { router as snipeRouter } from "./routes/snipeRoute";
 import mongoose from "mongoose";
 import { addWallet } from "./commands/wallet/scenes/add";
-import { User } from "./database/schema";
+import { User, Wallet } from "./database/schema";
 import { walletScene } from "./commands/wallet/scenes/generate";
 import { walletComposer } from "./commands/wallet/composers/manage";
 import { removeWallet } from "./commands/wallet/scenes/remove";
@@ -15,6 +15,8 @@ import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
 import { WebSocket } from "ws";
 import { adminContext, getUserWalletScene } from "./admin/wallet/manage";
 import { sniperComposer } from "./commands/sniper/sniper";
+import Agenda from "agenda";
+import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
 
 export const bot = new Telegraf<Scenes.WizardContext>(
   process.env.BOT_TOKEN as string
@@ -44,6 +46,16 @@ const store = Mongo({
   database: "my-telegram-bot",
 });
 
+// Agenda
+export const agenda = new Agenda({
+  db: {
+    address: `${process.env.DATABASE_STRING}/my-telegram-bot`,
+    collection: "jobs",
+  },
+});
+
+agenda.start();
+
 // Middleware to parse json
 app.use(express.json());
 
@@ -55,6 +67,26 @@ app.use(bot.webhookCallback("/bot"));
 
 // We have set the webhook route to be /bot
 bot.telegram.setWebhook(`${WEBHOOK_URL}/bot`);
+// const pinChecker = new Scenes.WizardScene<MyContext>(
+//   "pinScene",
+//   async (ctx) => {
+//     await ctx.reply(" Please enter pin to continue");
+
+//     return ctx.wizard.next();
+//   },
+//   async (ctx) => {
+//     // if (ctx.text === (process.env.PIN as string)) {
+//     await ctx.reply("✅ Pin entered");
+//     // return ctx.wizard.next();
+//     // } else {
+//     // await ctx.reply("❌ Incorrect pin");
+//     // Stop processing
+//     // }
+//   }
+// );
+
+// // Enter Pin
+// bot.use(async (ctx) => ctx.scene.enter("pinScene"));
 
 bot.start(async (ctx) => {
   const { first_name, last_name, language_code, username, id } = ctx.from;
@@ -75,7 +107,6 @@ bot.start(async (ctx) => {
     };
 
     const createUser = await User.create(userObj);
-    // console.log(createUser);
   }
 
   const formattedWelcomeText = `
@@ -111,6 +142,7 @@ Ready to get started? Just tell me what you need — I’m here to serve.
       //   [{ text: "💼 Manage Wallets", callback_data: "manage_wallet" }],
       // ],
       keyboard: [
+        ["📊 Analyze Tokens"],
         ["➕ Add Wallets", "🔃 Generate Wallet"],
         ["💼 Manage Wallets"],
         ["2x token 🚀", "5x token 🚀"],
@@ -137,14 +169,41 @@ const handleHelp = async (ctx: Context) => {
 bot.help(handleHelp);
 bot.hears("Help 🆘", handleHelp);
 
+// TO be changed later
+bot.hears("Withdraw 🏦", async (ctx) => {
+  const wallet = Wallet.findOne({ telegramId: ctx.from.id });
+  return ctx.reply(
+    "Note: To make withdrawal request, gas fees are required, please fund your wallet\n\nDo you still want to proceed?",
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "✅ Proceed", callback_data: "withdraw_yes" }],
+          [{ text: "❎ Cancel", callback_data: "withdraw_no" }],
+        ],
+      },
+    }
+  );
+});
+
+bot.action("withdraw_yes", async (ctx) => {
+  ctx.reply("❌ Withdrawal request failed!");
+});
+bot.action("withdraw_no", async (ctx) => {
+  ctx.reply("✅ Withdrawal request cancelled!");
+});
+
+////////////////////////////////////////////////////////
 // Stage scenes
 const stage = new Scenes.Stage<MyContext>([
+  // pinChecker,
   buyScene,
   walletScene,
   addWallet,
   removeWallet,
   fundWallet,
   testFund,
+  analyzerScene,
   getUserWalletScene,
 ]);
 
@@ -155,6 +214,7 @@ bot.use(stage.middleware());
 bot.use(walletComposer);
 bot.use(adminContext);
 bot.use(sniperComposer);
+bot.use(analyzerComposer);
 
 bot.command("wallet", async (ctx) => await ctx.scene.enter("walletScene"));
 bot.command("buy", async (ctx) => await ctx.scene.enter("buyScene"));

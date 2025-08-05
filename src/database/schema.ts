@@ -35,6 +35,11 @@ export const walletSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isTrading: {
+    type: Boolean,
+    default: false,
+  },
+  tokenTraded: String,
   tokenMultiplier: {
     type: Number,
     default: 2,
@@ -178,11 +183,13 @@ export const Wallet = mongoose.model("Wallet", walletSchema);
 // export const Trade = mongoose.model("Trade", tradeSchema);
 
 const metaSchema = new Schema({
-  launchPrice: {
-    type: Number,
+  launchPrice: Number,
+  tokenName: String,
+  tokenAddress: {
+    type: String,
     required: true,
   },
-  telegramId: String,
+  createdAt: Date,
 });
 
 export const Meta = mongoose.model("Meta", metaSchema);

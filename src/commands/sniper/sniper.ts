@@ -1,10 +1,14 @@
 import { Composer, Context } from "telegraf";
-import { bot, MyContext } from "../../bot";
+import { agenda, bot, MyContext } from "../../bot";
 import { User, Wallet } from "../../database/schema";
+import { Job, JobAttributesData } from "agenda";
+import mongoose from "mongoose";
 
 export const sniperComposer = new Composer<MyContext>();
 
-// const options = "2x token" || "5x token" || "10x token";
+interface HandleSnipe extends JobAttributesData {
+  walletId: mongoose.Types.ObjectId;
+}
 
 const handleSnipe = async (ctx: Context, minimumBalance: number) => {
   try {
@@ -46,9 +50,10 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
       isActive: true,
       tokenMultiplier: minimumBalance,
     });
+
     const launchPrice = getRandomLaunchPrice();
 
-    setTimeout(async () => {
+    agenda?.define("handle snipe", async (job: Job<HandleSnipe>) => {
       const currentBalance = Number(walletToTradeWIth.balance);
       const totalTokenBought = currentBalance / launchPrice;
       const targetPrice = launchPrice * walletToTradeWIth.tokenMultiplier;
@@ -69,7 +74,18 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
           } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
         );
       }
-    }, 1200000);
+    });
+
+    // Delete old job if it exists
+    await agenda.cancel({
+      name: "handle snipe",
+      "data.walletId": walletToTradeWIth._id,
+    });
+
+    // Create new job
+    await agenda.schedule("20 minutes", "handle snipe", {
+      walletId: walletToTradeWIth._id as mongoose.Types.ObjectId,
+    });
 
     return ctx.reply(`✅ Trading initiated successfully!.`);
   } catch (err) {
