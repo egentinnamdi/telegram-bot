@@ -21,7 +21,8 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
     }
 
     // Check if trade is already Active
-    const tradeWallet = await Wallet.findById(user._id, {
+    const tradeWallet = await Wallet.findOne({
+      userId: user._id,
       isActive: true,
     });
 
@@ -31,7 +32,8 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
 
     // Retrieve all user wallets
     const wallet = await Wallet.findOne({
-      $and: [{ userId: user._id }, { balance: { $gte: minimumBalance } }],
+      userId: user._id,
+      balance: { $gte: minimumBalance },
     });
 
     // Loop through wallets and check if any meets the minimum balance
