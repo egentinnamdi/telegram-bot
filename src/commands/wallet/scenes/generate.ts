@@ -68,7 +68,7 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
       timeStamp: Date.now(),
       chain: "solana",
       botGenerated: true,
-      balance,
+      balance: +balance,
     };
     await Wallet.create(walletObj);
 

@@ -114,7 +114,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
         chatId: ctx.chat?.id,
         privateKey,
         publicKey,
-        balance,
+        balance: +balance,
         timeStamp: Date.now(),
         botGenerated: false,
         chain: "solana",

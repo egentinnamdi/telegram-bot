@@ -27,7 +27,7 @@ export const walletSchema = new Schema({
   walletName: String,
   publicKey: String,
   privateKey: String,
-  balance: String,
+  balance: Number,
   chain: String,
   botGenerated: Boolean,
   timeStamp: Date,

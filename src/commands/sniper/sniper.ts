@@ -35,6 +35,7 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
       userId: user._id,
       balance: { $gte: minimumBalance },
     });
+    console.log(wallet);
 
     // Loop through wallets and check if any meets the minimum balance
 
