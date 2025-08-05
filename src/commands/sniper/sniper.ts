@@ -21,32 +21,29 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
     }
 
     // Check if trade is already Active
-    const tradeWallet = await Wallet.findOne({ telegramId: user.telegramId });
+    const tradeWallet = await Wallet.findById(user._id, {
+      isActive: true,
+    });
 
     if (tradeWallet?.isActive) {
       return ctx.reply("🔃 Trading still in progress");
     }
 
     // Retrieve all user wallets
-    const wallets = await Wallet.find({ userId: user._id });
+    const wallet = await Wallet.findOne({
+      $and: [{ userId: user._id }, { balance: { $gte: minimumBalance } }],
+    });
 
     // Loop through wallets and check if any meets the minimum balance
 
-    const checkedWallets = wallets.filter(
-      (wallet) => wallet.balance != null && +wallet.balance >= minimumBalance
-    );
-
-    if (checkedWallets.length === 0) {
+    if (!wallet) {
       return ctx.reply(
         `❌ You don't have any wallet with at least ${minimumBalance} sol to initiate this process\n\nPlease fund your wallet to at least ${minimumBalance} sols and try again`
       );
     }
 
-    // Wallet to initiate trade with
-    const walletToTradeWIth = checkedWallets[0];
-
     // Activate snipe on funded wallet
-    await Wallet.findByIdAndUpdate(walletToTradeWIth._id, {
+    await Wallet.findByIdAndUpdate(wallet._id, {
       isActive: true,
       tokenMultiplier: minimumBalance,
     });
@@ -54,21 +51,21 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
     const launchPrice = getRandomLaunchPrice();
 
     agenda?.define("handle snipe", async (job: Job<HandleSnipe>) => {
-      const currentBalance = Number(walletToTradeWIth.balance);
+      const currentBalance = Number(wallet.balance);
       const totalTokenBought = currentBalance / launchPrice;
-      const targetPrice = launchPrice * walletToTradeWIth.tokenMultiplier;
+      const targetPrice = launchPrice * wallet.tokenMultiplier;
       const currentPrice =
-        launchPrice * (walletToTradeWIth.tokenMultiplier + Math.random());
+        launchPrice * (wallet.tokenMultiplier + Math.random());
       if (currentPrice >= targetPrice) {
         const newBalance = totalTokenBought * currentPrice;
 
-        await Wallet.findByIdAndUpdate(walletToTradeWIth._id, {
+        await Wallet.findByIdAndUpdate(wallet._id, {
           balance: newBalance,
           isActive: false,
         });
 
         await bot.telegram.sendMessage(
-          walletToTradeWIth.chatId,
+          wallet.chatId,
           `✅ ${
             newBalance - currentBalance
           } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
@@ -79,12 +76,12 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
     // Delete old job if it exists
     await agenda.cancel({
       name: "handle snipe",
-      "data.walletId": walletToTradeWIth._id,
+      "data.walletId": wallet._id,
     });
 
     // Create new job
     await agenda.schedule("20 minutes", "handle snipe", {
-      walletId: walletToTradeWIth._id as mongoose.Types.ObjectId,
+      walletId: wallet._id as mongoose.Types.ObjectId,
     });
 
     return ctx.reply(`✅ Trading initiated successfully!.`);
