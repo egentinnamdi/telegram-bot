@@ -118,8 +118,8 @@ ${
 🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
 📌 *Chain:* ${wallet?.chain}\n\n\n
 `;
-    // escapeMarkdownV2(markdownText);
-    ctx.reply(markdownText, {
+    const markdownModified = escapeMarkdownV2(markdownText);
+    ctx.reply(markdownModified, {
       parse_mode: "Markdown",
     });
   });
@@ -138,5 +138,9 @@ adminContext.command("adminallwallet", async (ctx) => {
 });
 
 // adminContext.command("adminaddsol" async (ctx)=> {
-//   const user
+//   const user = await User.findOne({telegramId: ctx.from?.id});
+//   if (!user?.isAdmin){
+//     ctx
+//   }
+
 // })
