@@ -42,7 +42,7 @@ export const walletSchema = new Schema({
   tokenTraded: String,
   tokenMultiplier: {
     type: Number,
-    default: 2,
+    default: 0,
   },
 });
 

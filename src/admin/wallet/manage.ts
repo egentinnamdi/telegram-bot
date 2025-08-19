@@ -100,11 +100,10 @@ const allWallets = async (ctx: Context, type: string) => {
     type === "global" ? {} : { userId: user?._id }
   );
 
-  const reply = await Promise.all(
-    wallets.map(async (wallet) => {
-      const userGlobal =
-        type === "global" ? await User.findById(wallet.userId) : null;
-      const markdownText = `
+  wallets.map(async (wallet) => {
+    const userGlobal =
+      type === "global" ? await User.findById(wallet.userId) : null;
+    const markdownText = `
 *🪪 Wallet Information*
 
 👜 *Wallet Name:* ${wallet?.walletName}\n
@@ -119,11 +118,11 @@ ${
 🕒 *Created:* ${wallet?.timeStamp?.toLocaleDateString()}\n
 📌 *Chain:* ${wallet?.chain}\n\n\n
 `;
-      return escapeMarkdownV2(markdownText);
-    })
-  );
-
-  return ctx.replyWithMarkdownV2(reply.join(",").replaceAll(",", ""));
+    // escapeMarkdownV2(markdownText);
+    ctx.reply(markdownText, {
+      parse_mode: "Markdown",
+    });
+  });
 };
 
 adminContext.command("adminviewwallet", async (ctx) =>
@@ -137,3 +136,7 @@ adminContext.command("adminallwallet", async (ctx) => {
   }
   return allWallets(ctx, "global");
 });
+
+// adminContext.command("adminaddsol" async (ctx)=> {
+//   const user
+// })

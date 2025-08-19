@@ -3,8 +3,13 @@ import { Meta, Wallet, walletSchema } from "../database/schema";
 import { agenda, bot } from "../bot";
 import { DEX_ENDPOINT } from "../commands/sniper/analyzer";
 import mongoose, { InferSchemaType } from "mongoose";
+import { executeTrade } from "../utils/helper";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { getAndAnalyzeDetailedTokenReport } from "../utils/checks";
 
 export const router = express.Router();
+
+const quoteToken = "So11111111111111111111111111111111111111112";
 
 export type TokenPriceType = Array<{
   chainId: string;
@@ -91,6 +96,15 @@ router.post("/webhook", async (req, res) => {
     const event = req.body[0];
     if (event && event.type === "CREATE_POOL") {
       const newlyLaunchedToken = event.tokenTransfers[0].mint;
+
+      const isTokenValid = await getAndAnalyzeDetailedTokenReport(
+        newlyLaunchedToken
+      );
+
+      // Skip or proceed with token based on token report
+      // if (!isTokenValid) return;
+
+      // Run this token through thorough checks
 
       // Check if token exists first
       const existingToken = await Meta.findOne({
@@ -187,29 +201,48 @@ router.post("/webhook", async (req, res) => {
             }
 
             // Get Active but not yet trading wallets
-
             tradingWallets.map(async (activeWallet) => {
-              // Price not equal to 0, which means trade is currently going on
               const currentBalance = Number(activeWallet.balance);
-              const totalBoughtToken = currentBalance / launchPrice;
+              const amount = currentBalance * LAMPORTS_PER_SOL;
               const targetPrice = launchPrice * activeWallet.tokenMultiplier;
 
-              // After Buying coin, set trading to true
+              // If user is not actively trading yet, set trading, get order and sign it
               if (!activeWallet.isTrading) {
+                const balance = await executeTrade({
+                  inputMint: quoteToken,
+                  outputMint: token.tokenAddress,
+                  amount,
+                  privateKey: activeWallet.privateKey as string,
+                  publicKey: activeWallet.publicKey as string,
+                });
+
+                if (balance === false) return;
+                // After Buying coin, set trading to true
                 await Wallet.findByIdAndUpdate(activeWallet._id, {
                   isTrading: true,
                   tokenTraded: token.tokenAddress,
+                  balance,
                 });
               }
 
               if (currentPrice >= targetPrice) {
-                const newBalance = totalBoughtToken * currentPrice;
+                // Sell coin for sol
+                const totalSol = (activeWallet.balance ?? 0) * currentPrice;
+                const newBalance = (await executeTrade({
+                  inputMint: token.tokenAddress,
+                  outputMint: quoteToken,
+                  amount: totalSol,
+                  privateKey: activeWallet.privateKey as string,
+                  publicKey: activeWallet.publicKey as string,
+                })) as number;
 
                 // Store new balance to db and deactivate isActive
                 await Wallet.findByIdAndUpdate(activeWallet._id, {
                   balance: newBalance,
                   isActive: false,
                   isTrading: false,
+                  tokenTraded: "",
+                  tokenMultiplier: 0,
                 });
 
                 // Send Notification to user
