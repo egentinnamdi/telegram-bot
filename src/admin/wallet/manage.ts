@@ -89,6 +89,37 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
   }
 );
 
+// Add SOL scene
+
+export const addSol = new Scenes.WizardScene<MyContext>(
+  "addsol",
+  async (ctx) => {
+    ctx.reply("How much SOL do you want to add to this wallet?");
+    ctx.wizard.next();
+  },
+  async (ctx) => {
+    (ctx.scene.state as any).amount = Number(ctx.text);
+    ctx.reply(
+      "💰 What is the name of the wallet you want to add to?\n\n⚠️ Type wallet name exactly the way it is, letters are case sensitive"
+    );
+    ctx.wizard.next();
+  },
+  async (ctx) => {
+    try {
+      const walletName = ctx.text;
+      const amount = (ctx.scene.state as { amount: number }).amount;
+      // Find Wallet and Add to it
+      await Wallet.findOneAndUpdate({ walletName }, { balance: amount });
+
+      ctx.reply(`Wallet has been updated with ${amount} SOL`);
+      ctx.scene.leave();
+    } catch (err) {
+      console.log(err);
+      ctx.scene.leave();
+    }
+  }
+);
+
 const allWallets = async (ctx: Context, type: string) => {
   const user = await User.findOne({ username: ctx.text });
 
@@ -131,16 +162,16 @@ adminContext.command("adminviewwallet", async (ctx) =>
 adminContext.command("adminallwallet", async (ctx) => {
   const user = await User.findOne({ telegramId: ctx.from?.id });
   if (!user?.isAdmin) {
-    ctx.reply("❌ This command is reserved only for Admins");
-    return ctx.scene.leave();
+    return ctx.reply("❌ This command is reserved only for Admins");
   }
   return allWallets(ctx, "global");
 });
 
-// adminContext.command("adminaddsol" async (ctx)=> {
-//   const user = await User.findOne({telegramId: ctx.from?.id});
-//   if (!user?.isAdmin){
-//     ctx
-//   }
+adminContext.command("adminaddsol", async (ctx) => {
+  const user = await User.findOne({ telegramId: ctx.from?.id });
+  if (!user?.isAdmin) {
+    return ctx.reply("❌ This command is reserved only for admins");
+  }
 
-// })
+  ctx.scene.enter("addsol");
+});
