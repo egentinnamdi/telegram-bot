@@ -13,7 +13,11 @@ import { removeWallet } from "./commands/wallet/scenes/remove";
 import { Connection } from "@solana/web3.js";
 import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
 import { WebSocket } from "ws";
-import { adminContext, getUserWalletScene } from "./admin/wallet/manage";
+import {
+  addSol,
+  adminContext,
+  getUserWalletScene,
+} from "./admin/wallet/manage";
 import { sniperComposer } from "./commands/sniper/sniper";
 import Agenda from "agenda";
 import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
@@ -205,6 +209,7 @@ const stage = new Scenes.Stage<MyContext>([
   testFund,
   analyzerScene,
   getUserWalletScene,
+  addSol,
 ]);
 
 // Register scenes to global middleware and session
