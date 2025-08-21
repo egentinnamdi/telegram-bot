@@ -9,6 +9,7 @@ export async function signInToRugCheck({
   privateKey,
 }: {
   publicKey: string;
+
   privateKey: string;
 }) {
   const messageText = "Login to RugCHeck";
