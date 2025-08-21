@@ -1,5 +1,5 @@
-import { Composer } from "telegraf";
-import { MyContext } from "../../../bot";
+import { Composer, Scenes } from "telegraf";
+import { agenda, bot, MyContext } from "../../../bot";
 import { Wallet } from "../../../database/schema";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
 import { Context } from "telegraf";
@@ -15,6 +15,7 @@ const vewWallet = async (ctx: Context) => {
   });
 
   if (!wallets.length) {
+    ``;
     return ctx.reply("No wallet found");
   }
 
@@ -110,8 +111,8 @@ const manageWallet = async (ctx: Context) => {
     });
   }
 
-  const allUserWallets = wallets.map((item, index) =>
-    `${index + 1}. ${item.walletName}\n`
+  const allUserWallets = wallets.map(
+    (item, index) => `${index + 1}. ${item.walletName}\n`
   );
 
   const walletList = escapeMarkdownV2(`
@@ -211,3 +212,58 @@ Keep it safe and secure. 🛡️
     )
   );
 });
+
+// Withdraw Wallet
+export const withdrawFund = new Scenes.WizardScene<MyContext>(
+  "withdraw",
+  async (ctx) => {
+    ctx.reply("How do you want to withdraw?", {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "💵 2 SOL", callback_data: "two_sol" }],
+          [{ text: "💵 5 SOL", callback_data: "five_sol" }],
+          [{ text: "💵 10 SOL", callback_data: "ten_sol" }],
+        ],
+      },
+    });
+    ctx.wizard.next();
+  },
+  async (ctx) => {
+    const context = ctx.callbackQuery as unknown as { data: string };
+
+    if (context.data === "two_sol") {
+    } else {
+      console.log("");
+    }
+
+    ctx.reply("You will be charged 10% of your withdrawal amount", {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "✅ Continue", callback_data: "continue_withdraw" }],
+          [{ text: "❌ Cancel", callback_data: "cancel_withdraw" }],
+        ],
+      },
+    });
+    ctx.wizard.next();
+  },
+  async (ctx) => {
+    const context = ctx.callbackQuery as unknown as { data: string };
+
+    if (context.data === "cancel_withdraw") {
+      ctx.reply("✅ Withdrawal cancelled");
+      return ctx.scene.leave();
+    }
+
+    ctx.reply("🔃 Transaction in progress");
+    const wallet = Wallet.findOne({ telegramId: ctx.from?.id });
+    //   agenda?.define("handle snipe", async (job: Job<HandleSnipe>) => {
+
+    //     ctx.
+    //       await bot.telegram.sendMessage(
+    //         wallet.chatId,
+    //         `Your funds will arrive soon`
+    //       );
+    //     }
+    //   });
+  }
+);
