@@ -7,7 +7,7 @@ export const withdrawComposer = new Composer<MyContext>();
 export const withdrawFund = new Scenes.WizardScene<MyContext>(
   "withdraw",
   async (ctx) => {
-    ctx.reply("💵 How do you want to withdraw?", {
+    ctx.reply("💵 How much do you want to withdraw?", {
       //   reply_markup: {
       //     inline_keyboard: [
       //       [{ text: "💵 2 SOL", callback_data: "two_sol" }],
