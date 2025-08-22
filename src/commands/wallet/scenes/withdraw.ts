@@ -49,8 +49,8 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
     try {
       const context = ctx.callbackQuery as unknown as { data: string };
       if (
-        context.data === "continue_withdraw" ||
-        context.data === "cancel_withdraw"
+        context.data !== "continue_withdraw" &&
+        context.data !== "cancel_withdraw"
       ) {
         throw Error("Invalid option selected");
       }
