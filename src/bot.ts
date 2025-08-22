@@ -8,10 +8,7 @@ import mongoose from "mongoose";
 import { addWallet } from "./commands/wallet/scenes/add";
 import { User, Wallet } from "./database/schema";
 import { walletScene } from "./commands/wallet/scenes/generate";
-import {
-  walletComposer,
-  withdrawFund,
-} from "./commands/wallet/composers/manage";
+import { walletComposer } from "./commands/wallet/composers/manage";
 import { removeWallet } from "./commands/wallet/scenes/remove";
 import { Connection } from "@solana/web3.js";
 import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
@@ -24,8 +21,11 @@ import {
 import { sniperComposer } from "./commands/sniper/sniper";
 import Agenda from "agenda";
 import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
+import { withdrawFund } from "./commands/wallet/scenes/withdraw";
 
-export const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN as string);
+export const bot = new Telegraf<Scenes.WizardContext>(
+  process.env.BOT_TOKEN as string
+);
 const app = express();
 const port = process.env.PORT || 3000;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
@@ -175,22 +175,22 @@ bot.help(handleHelp);
 bot.hears("Help 🆘", handleHelp);
 
 // TO be changed later
-bot.hears("Withdraw 🏦", async (ctx) => {
-  // const wallet = Wallet.findOne({ telegramId: ctx.from.id });
-  // return ctx.reply(
-  //   "Note: To make withdrawal request, gas fees are required, please fund your wallet\n\nDo you still want to proceed?",
-  //   {
-  //     parse_mode: "Markdown",
-  //     reply_markup: {
-  //       inline_keyboard: [
-  //         [{ text: "✅ Proceed", callback_data: "withdraw_yes" }],
-  //         [{ text: "❎ Cancel", callback_data: "withdraw_no" }],
-  //       ],
-  //     },
-  //   }
-  // );
-  ctx.scene?.enter("withdraw");
-});
+// bot.hears("Withdraw 🏦", async (ctx) => {
+// const wallet = Wallet.findOne({ telegramId: ctx.from.id });
+// return ctx.reply(
+//   "Note: To make withdrawal request, gas fees are required, please fund your wallet\n\nDo you still want to proceed?",
+//   {
+//     parse_mode: "Markdown",
+//     reply_markup: {
+//       inline_keyboard: [
+//         [{ text: "✅ Proceed", callback_data: "withdraw_yes" }],
+//         [{ text: "❎ Cancel", callback_data: "withdraw_no" }],
+//       ],
+//     },
+//   }
+// );
+//   await ctx.scene?.enter("withdraw");
+// });
 
 bot.action("withdraw_yes", async (ctx) => {
   ctx.reply("❌ Withdrawal request failed!");
