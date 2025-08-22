@@ -76,15 +76,15 @@ const handleSnipe = async (ctx: Context, minimumBalance: number) => {
     });
 
     // Delete old job if it exists
-    // await agenda.cancel({
-    //   name: "handle snipe",
-    //   "data.walletId": wallet._id,
-    // });
+    await agenda.cancel({
+      name: "handle snipe",
+      "data.walletId": wallet._id,
+    });
 
     // Create new job
-    // await agenda.schedule("20 minutes", "handle snipe", {
-    //   walletId: wallet._id as mongoose.Types.ObjectId,
-    // });
+    await agenda.schedule("20 minutes", "handle snipe", {
+      walletId: wallet._id as mongoose.Types.ObjectId,
+    });
 
     return ctx.reply(`✅ Trading initiated successfully!.`);
   } catch (err) {

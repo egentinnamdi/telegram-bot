@@ -1,5 +1,5 @@
 import { Composer, Scenes } from "telegraf";
-import { MyContext } from "../../../bot";
+import { agenda, bot, MyContext } from "../../../bot";
 import { User, Wallet } from "../../../database/schema";
 
 export const withdrawComposer = new Composer<MyContext>();
@@ -60,16 +60,27 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
       }
 
       ctx.reply("🔃 Transaction in progress");
-      const wallet = Wallet.findOne({ telegramId: ctx.from?.id });
-      //   agenda?.define("handle snipe", async (job: Job<HandleSnipe>) => {
+      const wallet = await Wallet.findOne({ telegramId: ctx.from?.id });
+      agenda?.define("withdraw", async () => {
+        if (
+          typeof wallet?.chatId === "string" ||
+          typeof wallet?.chatId === "number"
+        ) {
+          await bot.telegram.sendMessage(
+            wallet?.chatId,
+            `Your funds will arrive soon`
+          );
+        }
+      });
 
-      //     ctx.
-      //       await bot.telegram.sendMessage(
-      //         wallet.chatId,
-      //         `Your funds will arrive soon`
-      //       );
-      //     }
-      //   });
+      await agenda.cancel({
+        name: "withdraw",
+        "data.walletId": wallet?._id,
+      });
+
+      await agenda.schedule("2 minutes", "withdraw", {
+        // walletId: wallet._id as mongoose.Types.ObjectId,
+      });
     } catch (err) {
       console.log(err);
       ctx.reply("An error occcured, please try again");
