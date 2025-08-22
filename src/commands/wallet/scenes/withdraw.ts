@@ -18,10 +18,18 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
     });
     ctx.wizard.next();
   },
+  //   async (ctx) => {
+  //     const user = await User.findOne({ telegramId: ctx.from?.id });
+  //     if (!user) {
+  //       ctx.reply("You need to create a wallet first");
+  //       return ctx.scene.leave();
+  //     }
+  //   },
+
   async (ctx) => {
     // Check if Input is a Number
     const amountToWithdraw = Number(ctx.text);
-    if (isNaN(amountToWithdraw)) {
+    if (typeof amountToWithdraw !== "number") {
       ctx.reply("⚠️ Please enter a valid number");
       return ctx.scene.leave();
     }
@@ -30,10 +38,10 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
     // Get Wallet and Check if balance is not greater than
     const wallet = await Wallet.findOne({ telegramId: ctx.from?.id });
     console.log(wallet?.balance);
-    if (wallet?.balance && amountToWithdraw < wallet.balance) {
-      ctx.reply("⚠️ You do not have enough balance to withdraw");
-      return ctx.scene.leave();
-    }
+    // if (wallet?.balance && amountToWithdraw < wallet.balance) {
+    //   ctx.reply("⚠️ You do not have enough balance to withdraw");
+    //   return ctx.scene.leave();
+    // }
 
     ctx.reply("You will be charged 10% of your withdrawal amount", {
       reply_markup: {
