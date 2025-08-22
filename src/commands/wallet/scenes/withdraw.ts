@@ -7,23 +7,31 @@ export const withdrawComposer = new Composer<MyContext>();
 export const withdrawFund = new Scenes.WizardScene<MyContext>(
   "withdraw",
   async (ctx) => {
-    ctx.reply("How do you want to withdraw?", {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: "💵 2 SOL", callback_data: "two_sol" }],
-          [{ text: "💵 5 SOL", callback_data: "five_sol" }],
-          [{ text: "💵 10 SOL", callback_data: "ten_sol" }],
-        ],
-      },
+    ctx.reply("💵 How do you want to withdraw?", {
+      //   reply_markup: {
+      //     inline_keyboard: [
+      //       [{ text: "💵 2 SOL", callback_data: "two_sol" }],
+      //       [{ text: "💵 5 SOL", callback_data: "five_sol" }],
+      //       [{ text: "💵 10 SOL", callback_data: "ten_sol" }],
+      //     ],
+      //   },
     });
     ctx.wizard.next();
   },
   async (ctx) => {
-    const context = ctx.callbackQuery as unknown as { data: string };
+    // Check if Input is a Number
+    const amountToWithdraw = Number(ctx.text);
+    if (isNaN(amountToWithdraw)) {
+      ctx.reply("⚠️ Please enter a valid number");
+      return ctx.scene.leave();
+    }
 
-    if (context.data === "two_sol") {
-    } else {
-      console.log("");
+    // const context = ctx.callbackQuery as unknown as { data: string };
+    // Get Wallet and Check if balance is not greater than
+    const wallet = await Wallet.findOne({ telegramId: ctx.from?.id });
+    if (wallet?.balance ?? 0 < amountToWithdraw) {
+      ctx.reply("⚠️ You do not have enough balance to withdraw");
+      return ctx.scene.leave();
     }
 
     ctx.reply("You will be charged 10% of your withdrawal amount", {
