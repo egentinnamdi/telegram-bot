@@ -25,9 +25,7 @@ import { sniperComposer } from "./commands/sniper/sniper";
 import Agenda from "agenda";
 import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
 
-export const bot = new Telegraf<Scenes.WizardContext>(
-  process.env.BOT_TOKEN as string
-);
+export const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN as string);
 const app = express();
 const port = process.env.PORT || 3000;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
@@ -191,7 +189,7 @@ bot.hears("Withdraw 🏦", async (ctx) => {
   //     },
   //   }
   // );
-  ctx.scene.enter("withdraw");
+  await ctx.scene?.enter("withdraw");
 });
 
 bot.action("withdraw_yes", async (ctx) => {
