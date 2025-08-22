@@ -189,7 +189,7 @@ bot.hears("Withdraw 🏦", async (ctx) => {
   //     },
   //   }
   // );
-  await ctx.scene?.enter("withdraw");
+  ctx.scene?.enter("withdraw");
 });
 
 bot.action("withdraw_yes", async (ctx) => {
