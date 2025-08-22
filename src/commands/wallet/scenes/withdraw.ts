@@ -2,7 +2,7 @@ import { Composer, Scenes } from "telegraf";
 import { MyContext } from "../../../bot";
 import { User, Wallet } from "../../../database/schema";
 
-const withdrawComposer = new Composer<MyContext>();
+export const withdrawComposer = new Composer<MyContext>();
 
 export const withdrawFund = new Scenes.WizardScene<MyContext>(
   "withdraw",

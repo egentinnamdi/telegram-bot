@@ -21,7 +21,10 @@ import {
 import { sniperComposer } from "./commands/sniper/sniper";
 import Agenda from "agenda";
 import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
-import { withdrawFund } from "./commands/wallet/scenes/withdraw";
+import {
+  withdrawComposer,
+  withdrawFund,
+} from "./commands/wallet/scenes/withdraw";
 
 export const bot = new Telegraf<Scenes.WizardContext>(
   process.env.BOT_TOKEN as string
@@ -223,6 +226,7 @@ bot.use(walletComposer);
 bot.use(adminContext);
 bot.use(sniperComposer);
 bot.use(analyzerComposer);
+bot.use(withdrawComposer);
 
 bot.command("wallet", async (ctx) => await ctx.scene.enter("walletScene"));
 bot.command("buy", async (ctx) => await ctx.scene.enter("buyScene"));
