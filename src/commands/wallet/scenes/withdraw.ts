@@ -29,7 +29,8 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
     // const context = ctx.callbackQuery as unknown as { data: string };
     // Get Wallet and Check if balance is not greater than
     const wallet = await Wallet.findOne({ telegramId: ctx.from?.id });
-    if (wallet?.balance ?? 0 < amountToWithdraw) {
+    console.log(wallet?.balance);
+    if (wallet?.balance && amountToWithdraw < wallet.balance) {
       ctx.reply("⚠️ You do not have enough balance to withdraw");
       return ctx.scene.leave();
     }
