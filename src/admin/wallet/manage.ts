@@ -159,10 +159,7 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
         await allWallets(ctx, "global");
       }
 
-      if (
-        pageNumber &&
-        (typeof pageNumber !== "number" || pageNumber > pageLength)
-      ) {
+      if (pageNumber && (Number.isNaN(pageNumber) || pageNumber > pageLength)) {
         throw Error("❌ Input a valid number");
       }
 
