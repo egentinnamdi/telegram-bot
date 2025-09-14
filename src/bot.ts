@@ -16,7 +16,9 @@ import { WebSocket } from "ws";
 import {
   addSol,
   adminContext,
+  deleteWallet,
   getUserWalletScene,
+  getWallets,
 } from "./admin/wallet/manage";
 import { sniperComposer } from "./commands/sniper/sniper";
 import Agenda from "agenda";
@@ -216,6 +218,8 @@ const stage = new Scenes.Stage<MyContext>([
   getUserWalletScene,
   addSol,
   withdrawFund,
+  deleteWallet,
+  getWallets,
 ]);
 
 // Register scenes to global middleware and session

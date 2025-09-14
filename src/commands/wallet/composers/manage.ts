@@ -4,6 +4,7 @@ import { Wallet } from "../../../database/schema";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
 import { Context } from "telegraf";
 import { User } from "../../../database/schema";
+import { getBalance } from "../../../utils/helper";
 
 export const walletComposer = new Composer<MyContext>();
 
@@ -95,6 +96,8 @@ const manageWallet = async (ctx: Context) => {
   const wallets = await Wallet.find({
     userId: user._id,
   });
+
+  // getBalance("BiQFnjfTHpuin47BaxyZzrBVQqJoJGArsCmzwnSLyUc8");
 
   // No wallet Found
   if (!wallets.length) {

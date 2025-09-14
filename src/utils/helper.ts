@@ -5,6 +5,7 @@ import base58 from "bs58";
 import { connection } from "../bot";
 
 export const SWAP_URL = `https://lite-api.jup.ag/ultra/v1/order`;
+const GET_BLOCK_URL = "https://go.getblock.us/bce6ef98e25a4747981b858e7a78b316";
 
 interface TransactionType {
   inputMint: string;
@@ -68,5 +69,36 @@ export async function executeTrade({
   } catch (err) {
     console.log(err);
     return false;
+  }
+}
+
+export async function getBalance(
+  publicKey: PublicKey
+): Promise<number | undefined> {
+  try {
+    const payload = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getBalance",
+      params: [publicKey, null],
+    };
+
+    const response = await fetch(GET_BLOCK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw Error("Could not retrieve wallet balance");
+    }
+
+    const data = await response.json();
+
+    return data.result.value;
+  } catch (err) {
+    console.log(err);
   }
 }

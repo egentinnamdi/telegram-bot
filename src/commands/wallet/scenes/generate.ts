@@ -4,7 +4,7 @@ import { connection, MyContext } from "../../../bot";
 import { User, Wallet } from "../../../database/schema";
 import mongoose from "mongoose";
 import base58 from "bs58";
-import { checkWalletName } from "../../../utils/helper";
+import { checkWalletName, getBalance } from "../../../utils/helper";
 
 export const walletScene = new Scenes.WizardScene<MyContext>(
   "walletScene",
@@ -56,7 +56,8 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
 
     const encodedSecretKey = base58.encode(keypair.secretKey);
     // Save private / secret key to database for wallet retrieval
-    const balance = await connection.getBalance(keypair.publicKey);
+    // const balance = await connection.getBalance(keypair.publicKey);
+    const balance = await getBalance(keypair.publicKey);
 
     const walletObj = {
       walletName,
@@ -68,7 +69,7 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
       timeStamp: Date.now(),
       chain: "solana",
       botGenerated: true,
-      balance: +balance,
+      balance: balance ?? 0,
     };
     await Wallet.create(walletObj);
 

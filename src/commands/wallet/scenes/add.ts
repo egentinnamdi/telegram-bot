@@ -5,7 +5,7 @@ import { connection, MyContext } from "../../../bot";
 import { User, userSchema, Wallet } from "../../../database/schema";
 import { InferSchemaType, Types } from "mongoose";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
-import { checkWalletName } from "../../../utils/helper";
+import { checkWalletName, getBalance } from "../../../utils/helper";
 
 type WalletState = {
   name: string;
@@ -105,7 +105,8 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       const privateKey = base58.encode(keypair.secretKey);
 
       // Onchain (solana) information
-      const balance = await connection.getBalance(publicKey);
+      // const balance = await connection.getBalance(publicKey);
+      const balance = await getBalance(publicKey);
 
       const walletObj = {
         walletName,
@@ -114,7 +115,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
         chatId: ctx.chat?.id,
         privateKey,
         publicKey,
-        balance: +balance,
+        balance: balance ?? 0,
         timeStamp: Date.now(),
         botGenerated: false,
         chain: "solana",
