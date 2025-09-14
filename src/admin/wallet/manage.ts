@@ -150,6 +150,7 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
     try {
       const pageLength = (ctx.scene.state as { pageLength: number }).pageLength;
       const pageNumber = Number(ctx.text);
+      console.log(typeof pageNumber);
       const context = ctx.callbackQuery as unknown as {
         data: string;
       };
@@ -158,7 +159,10 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
         await allWallets(ctx, "global");
       }
 
-      if (pageNumber && (isNaN(pageNumber) || pageNumber > pageLength)) {
+      if (
+        pageNumber &&
+        (typeof pageNumber !== "number" || pageNumber > pageLength)
+      ) {
         throw Error("❌ Input a valid number");
       }
 
