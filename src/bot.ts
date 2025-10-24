@@ -20,7 +20,7 @@ import {
   getUserWalletScene,
   getWallets,
 } from "./admin/wallet/manage";
-import { sniperComposer } from "./commands/sniper/sniper";
+import { handleSnipeScene, sniperComposer } from "./commands/sniper/sniper";
 import Agenda from "agenda";
 import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
 import {
@@ -152,11 +152,11 @@ Ready to get started? Just tell me what you need — I’m here to serve.
       //   [{ text: "💼 Manage Wallets", callback_data: "manage_wallet" }],
       // ],
       keyboard: [
-        ["📊 Analyze Tokens"],
         ["➕ Add Wallets", "🔃 Generate Wallet"],
         ["💼 Manage Wallets"],
         ["2x token 🚀", "5x token 🚀"],
         ["10x token 🚀"],
+        ["📊 Analyze Tokens", "❌ Cancel Trade"],
         ["Withdraw 🏦", "Help 🆘"],
       ],
       resize_keyboard: true,
@@ -220,6 +220,7 @@ const stage = new Scenes.Stage<MyContext>([
   withdrawFund,
   deleteWallet,
   getWallets,
+  handleSnipeScene,
 ]);
 
 // Register scenes to global middleware and session
@@ -227,6 +228,7 @@ bot.use(session({ store: store as any }));
 // bot.use((ctx) => coinAnalyzer(ctx));
 bot.use(stage.middleware());
 bot.use(walletComposer);
+
 bot.use(adminContext);
 bot.use(sniperComposer);
 bot.use(analyzerComposer);

@@ -150,7 +150,6 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
     try {
       const pageLength = (ctx.scene.state as { pageLength: number }).pageLength;
       const pageNumber = Number(ctx.text);
-      console.log(typeof pageNumber);
       const context = ctx.callbackQuery as unknown as {
         data: string;
       };
