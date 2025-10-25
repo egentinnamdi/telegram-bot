@@ -49,7 +49,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
 
       await ctx.reply(
         "Input how you want to import this wallet\n\n" +
-          "1️⃣ Import by Private Key\n" +
+          "1️⃣ Import by Private Key\n\n" +
           "2️⃣ Import by Pass phrase" +
           "\n\n✅ Select using the index 1 or 2"
       );
@@ -114,12 +114,32 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
         const privateKeyBase58 = base58.encode(keypair.secretKey);
         (ctx.scene.state as { privateToken: string }).privateToken =
           privateKeyBase58;
+
+        await ctx.reply("🔃 Importing wallet\n\n click `Continue 👍`", {
+          parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "Continue 👍", callback_data: "continue" }],
+            ],
+          },
+        });
+
         return ctx.wizard.next();
       }
 
       // Move to next step if import method is not by passphrase
       (ctx.scene.state as { privateToken: string }).privateToken =
         ctx.text || "";
+
+      await ctx.reply("🔃 Importing wallet\n\n click `Continue 👍`", {
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "Continue 👍", callback_data: "continue" }],
+          ],
+        },
+      });
+
       return ctx.wizard.next();
     } catch (err) {
       console.log(err);
@@ -133,19 +153,21 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
 
   // Step Five - Store to db after verifying that key was provided
   async (ctx) => {
-    const privateToken = (ctx.scene.state as { privateToken: string })
-      .privateToken;
-
     try {
+      const privateToken = (ctx.scene.state as { privateToken: string })
+        .privateToken;
+
       if (!privateToken) {
-        return ctx.reply("🔑 Please provide a valid private key or passphrase");
+        return await ctx.reply(
+          "🔑 Please provide a valid private key or passphrase"
+        );
       }
       if (privateToken.toLowerCase() === "new") {
-        ctx.reply("🔃 Restarting the process, please type `continue`");
+        await ctx.reply("🔃 Restarting the process, please type `continue`");
         return ctx.wizard.selectStep(0);
       }
       if (privateToken.toLowerCase() === "cancel") {
-        ctx.reply("❎ Process cancelled");
+        await ctx.reply("❎ Process cancelled");
         return ctx.scene.leave();
       }
 
@@ -209,13 +231,13 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       };
       await Wallet.create(walletObj);
 
-      ctx.reply("✅ Wallet Imported Successfully...");
+      await ctx.reply("✅ Wallet Imported Successfully...");
 
       return ctx.scene.leave();
     } catch (err) {
       const error = err as Error;
       console.log(error);
-      ctx.reply("❌ Invalid private key, please try again");
+      await ctx.reply("❌ Invalid private key, please try again");
 
       return ctx.scene.leave();
     }
