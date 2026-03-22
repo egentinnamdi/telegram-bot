@@ -29,7 +29,7 @@ import {
 } from "./commands/wallet/scenes/withdraw";
 
 export const bot = new Telegraf<Scenes.WizardContext>(
-  process.env.BOT_TOKEN as string
+  process.env.BOT_TOKEN as string,
 );
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,11 +38,11 @@ export const API_KEY = process.env.HELIUS_API_KEY as string;
 
 export const connection = new Connection(
   `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`,
-  "confirmed"
+  "confirmed",
 );
 
 export const ws = new WebSocket(
-  `wss://mainnet.helius-rpc.com/?api-key=${API_KEY}`
+  `wss://mainnet.helius-rpc.com/?api-key=${API_KEY}`,
 );
 
 mongoose
@@ -73,10 +73,10 @@ app.use(express.json());
 app.use("/snipe", snipeRouter);
 
 // any request to the bot will be forwarded here and thereby handled
-app.use(bot.webhookCallback("/bot"));
+app.use(bot.webhookCallback("/server"));
 
-// We have set the webhook route to be /bot
-bot.telegram.setWebhook(`${WEBHOOK_URL}/bot`);
+// We have set the webhook route to be /server
+bot.telegram.setWebhook(`${WEBHOOK_URL}/server`);
 // const pinChecker = new Scenes.WizardScene<MyContext>(
 //   "pinScene",
 //   async (ctx) => {
@@ -172,7 +172,7 @@ const handleHelp = async (ctx: Context) => {
 🧑‍💻  Help Desk:
 [@Ian_onSol001](https://t.me/Ian_onSol001)
 `,
-    { parse_mode: "Markdown" }
+    { parse_mode: "Markdown" },
   );
 };
 

@@ -1,6 +1,6 @@
 import { Keypair } from "@solana/web3.js";
 import { Scenes } from "telegraf";
-import { connection, MyContext } from "../../../bot";
+import { connection, MyContext } from "../../../server";
 import { User, Wallet } from "../../../database/schema";
 import mongoose from "mongoose";
 import base58 from "bs58";
@@ -51,7 +51,7 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
     // Create wallet
     const keypair = Keypair.generate();
     ctx.reply(
-      `✅ Wallet created, this is your public key ${keypair.publicKey.toBase58()}`
+      `✅ Wallet created, this is your public key ${keypair.publicKey.toBase58()}`,
     );
 
     const encodedSecretKey = base58.encode(keypair.secretKey);
@@ -74,5 +74,5 @@ export const walletScene = new Scenes.WizardScene<MyContext>(
     await Wallet.create(walletObj);
 
     return ctx.scene.leave();
-  }
+  },
 );

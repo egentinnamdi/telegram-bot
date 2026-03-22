@@ -1,5 +1,5 @@
 import { Composer, Scenes } from "telegraf";
-import { MyContext } from "../../bot";
+import { MyContext } from "../../server";
 import { TokenPriceType } from "../../routes/snipeRoute";
 
 export const analyzerComposer = new Composer<MyContext>();
@@ -86,13 +86,13 @@ export const analyzerScene = new Scenes.WizardScene<MyContext>(
               ],
             ],
           },
-        }
+        },
       );
       ctx.wizard.next();
     } catch (err) {
       console.log(err);
       ctx.reply(
-        "❌ There was an error analyzing this token, make sure the token address is correct"
+        "❌ There was an error analyzing this token, make sure the token address is correct",
       );
       ctx.scene.leave();
     }
@@ -106,16 +106,16 @@ export const analyzerScene = new Scenes.WizardScene<MyContext>(
       ctx.reply("❌ There was an error processing this");
       ctx.scene.leave();
     }
-  }
+  },
 );
 
 analyzerComposer.command(
   "analyze",
-  async (ctx) => await ctx.scene.enter("analyzerScene")
+  async (ctx) => await ctx.scene.enter("analyzerScene"),
 );
 analyzerComposer.hears(
   "📊 Analyze Tokens",
-  async (ctx) => await ctx.scene.enter("analyzerScene")
+  async (ctx) => await ctx.scene.enter("analyzerScene"),
 );
 
 // 📊 *Transaction Activity:*

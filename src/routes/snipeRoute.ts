@@ -1,6 +1,6 @@
 import express from "express";
 import { Meta, Wallet, walletSchema } from "../database/schema";
-import { agenda, bot } from "../bot";
+import { agenda, bot } from "../server";
 import { DEX_ENDPOINT } from "../commands/sniper/analyzer";
 import mongoose, { InferSchemaType } from "mongoose";
 import { executeTrade } from "../utils/helper";
@@ -97,9 +97,8 @@ router.post("/webhook", async (req, res) => {
     if (event && event.type === "CREATE_POOL") {
       const newlyLaunchedToken = event.tokenTransfers[0].mint;
 
-      const isTokenValid = await getAndAnalyzeDetailedTokenReport(
-        newlyLaunchedToken
-      );
+      const isTokenValid =
+        await getAndAnalyzeDetailedTokenReport(newlyLaunchedToken);
 
       // Skip or proceed with token based on token report
       // if (!isTokenValid) return;
@@ -138,13 +137,13 @@ router.post("/webhook", async (req, res) => {
                 headers: {
                   Accept: "*/*",
                 },
-              }
+              },
             );
 
             const result = (await response.json()) as TokenPriceType;
 
             const filtered = result.filter(
-              (item) => item.dexId === "raydium"
+              (item) => item.dexId === "raydium",
             )[0];
             console.log(filtered);
 
@@ -250,7 +249,7 @@ router.post("/webhook", async (req, res) => {
                   activeWallet.chatId,
                   `✅ ${
                     newBalance - currentBalance
-                  } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
+                  } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`,
                 );
               }
             });

@@ -1,5 +1,5 @@
 import { Scenes } from "telegraf";
-import { connection, MyContext } from "../../../bot";
+import { connection, MyContext } from "../../../server";
 import { watchAccountChanges } from "../../../services/subscription.service";
 import { User, Wallet } from "../../../database/schema";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
@@ -16,7 +16,7 @@ export const fundWallet = new Scenes.WizardScene<MyContext>(
 
       const publicKey = context.message.text.split("\n")[6];
       ctx.reply(
-        `⚠️ Please fund your wallet by sending SOL to the public address provided. Make sure to send only SOL to avoid losing your fund.\n\n👇👇👇\n\n${publicKey}`
+        `⚠️ Please fund your wallet by sending SOL to the public address provided. Make sure to send only SOL to avoid losing your fund.\n\n👇👇👇\n\n${publicKey}`,
       );
 
       // Before leaving scene, subscribe to websocket event
@@ -29,7 +29,7 @@ export const fundWallet = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.scene.leave();
     }
-  }
+  },
 );
 
 export const testFund = new Scenes.WizardScene<MyContext>(
@@ -50,7 +50,7 @@ export const testFund = new Scenes.WizardScene<MyContext>(
 
         // Give Feedback and leave scene
         ctx.reply(
-          "✅ Test successful, Sol added to wallet, event should trigger now"
+          "✅ Test successful, Sol added to wallet, event should trigger now",
         );
         ctx.scene.leave();
       }
@@ -59,5 +59,5 @@ export const testFund = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.scene.leave();
     }
-  }
+  },
 );

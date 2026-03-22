@@ -1,5 +1,5 @@
 import { Scenes } from "telegraf";
-import { MyContext } from "../bot";
+import { MyContext } from "../server";
 
 // We are telling telegraf the kind of scene of scene we want ot set up
 export const buyScene = new Scenes.WizardScene<MyContext>(
@@ -7,7 +7,7 @@ export const buyScene = new Scenes.WizardScene<MyContext>(
   async (ctx) => {
     // Step !: Ask for token symbol or address
     await ctx.reply(
-      "What token do you want to buy? (Enter token symbol or address)"
+      "What token do you want to buy? (Enter token symbol or address)",
     );
     return ctx.wizard.next();
   },
@@ -22,7 +22,7 @@ export const buyScene = new Scenes.WizardScene<MyContext>(
     (ctx.wizard.state as any).amount = ctx.text;
     const token = (ctx.wizard.state as any).token;
     await ctx.reply(
-      `You are about to buy ${token} for ${ctx.text} SOl\nType yes to continue and no to cancel`
+      `You are about to buy ${token} for ${ctx.text} SOl\nType yes to continue and no to cancel`,
     );
   },
   async (ctx) => {
@@ -35,5 +35,5 @@ export const buyScene = new Scenes.WizardScene<MyContext>(
     }
 
     return ctx.scene.leave(); //Exit scene
-  }
+  },
 );

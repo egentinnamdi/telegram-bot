@@ -1,5 +1,5 @@
 import { Composer, Scenes } from "telegraf";
-import { agenda, bot, MyContext } from "../../../bot";
+import { agenda, bot, MyContext } from "../../../server";
 import { Wallet } from "../../../database/schema";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
 import { Context } from "telegraf";
@@ -63,8 +63,8 @@ ${item.botGenerated ? "Yes" : "No"}
               : [],
           ],
         },
-      }
-    )
+      },
+    ),
   );
   return;
 };
@@ -115,7 +115,7 @@ const manageWallet = async (ctx: Context) => {
   }
 
   const allUserWallets = wallets.map(
-    (item, index) => `${index + 1}. ${item.walletName}\n`
+    (item, index) => `${index + 1}. ${item.walletName}\n`,
   );
 
   const walletList = escapeMarkdownV2(`
@@ -166,18 +166,18 @@ walletComposer.action("add_wallet", async (ctx) => {
 });
 walletComposer.hears(
   "➕ Add Wallets",
-  async (ctx) => await ctx.scene.enter("addWallet")
+  async (ctx) => await ctx.scene.enter("addWallet"),
 );
 
 // Generate
 walletComposer.action(
   "generate_wallet",
-  async (ctx) => await ctx.scene.enter("walletScene")
+  async (ctx) => await ctx.scene.enter("walletScene"),
 );
 
 walletComposer.hears(
   "🔃 Generate Wallet",
-  async (ctx) => await ctx.scene.enter("walletScene")
+  async (ctx) => await ctx.scene.enter("walletScene"),
 );
 
 // Remove
@@ -193,7 +193,7 @@ walletComposer.action("find_remove_wallet", async (ctx) => {
 
 // Fund
 walletComposer.action("fund_wallet", async (ctx) =>
-  ctx.scene.enter("fundWallet")
+  ctx.scene.enter("fundWallet"),
 );
 
 // Export
@@ -211,7 +211,7 @@ ${wallet?.privateKey}
 Never share this private key with anyone!  
 Anyone who has it can take full control of your wallet and all its funds.  
 Keep it safe and secure. 🛡️
-    `
-    )
+    `,
+    ),
   );
 });

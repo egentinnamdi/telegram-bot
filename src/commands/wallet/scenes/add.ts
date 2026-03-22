@@ -1,7 +1,7 @@
 import { Keypair } from "@solana/web3.js";
 import base58 from "bs58";
 import { Scenes } from "telegraf";
-import { connection, MyContext } from "../../../bot";
+import { connection, MyContext } from "../../../server";
 import { User, userSchema, Wallet } from "../../../database/schema";
 import { InferSchemaType, Types } from "mongoose";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
@@ -25,7 +25,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
     // Redirect and leave scene if user doesn't exist
     if (!user) {
       await ctx.reply(
-        "⛔ User not found, first create a user profile by running /start"
+        "⛔ User not found, first create a user profile by running /start",
       );
       return ctx.scene.leave();
     }
@@ -51,14 +51,14 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
         "Input how you want to import this wallet\n\n" +
           "1️⃣ Import by Private Key\n\n" +
           "2️⃣ Import by Pass phrase" +
-          "\n\n✅ Select using the index 1 or 2"
+          "\n\n✅ Select using the index 1 or 2",
       );
       return ctx.wizard.next();
     } catch (err) {
       console.log(err);
       ctx.reply(
         (err as unknown as Error).message ||
-          "❌ There was an error, please try again"
+          "❌ There was an error, please try again",
       );
       return ctx.scene.leave();
     }
@@ -77,7 +77,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       importMethod === 2 &&
         (await ctx.reply(
           "🪪 Please send your 12 or 24-word Solana wallet passphrase (mnemonic).\n\n⚠️ *Make sure this is a private chat* — never share it elsewhere!",
-          { parse_mode: "Markdown" }
+          { parse_mode: "Markdown" },
         ));
 
       // Save import method to state for reuse
@@ -88,7 +88,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.reply(
         (err as unknown as Error).message ||
-          "❌ There was an error, please try again"
+          "❌ There was an error, please try again",
       );
       return ctx.scene.leave();
     }
@@ -145,7 +145,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.reply(
         (err as unknown as Error).message ||
-          "❌ There was an error, please try again"
+          "❌ There was an error, please try again",
       );
       return ctx.scene.leave();
     }
@@ -159,7 +159,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
 
       if (!privateToken) {
         return await ctx.reply(
-          "🔑 Please provide a valid private key or passphrase"
+          "🔑 Please provide a valid private key or passphrase",
         );
       }
       if (privateToken.toLowerCase() === "new") {
@@ -178,7 +178,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
 
       // Decode privatekey to bytes
       const privateKeyBytes = base58.decode(
-        (ctx.scene.state as WalletState).private
+        (ctx.scene.state as WalletState).private,
       );
       // Get Wallet info
       const keypair = Keypair.fromSecretKey(privateKeyBytes);
@@ -198,7 +198,7 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
       if (exists) {
         const message = escapeMarkdownV2(
           "⚠️ *You've already added this wallet.*\n" +
-            "Type `new` to restart the process or `cancel` to exit."
+            "Type `new` to restart the process or `cancel` to exit.",
         );
 
         ctx.replyWithMarkdownV2(message);
@@ -241,5 +241,5 @@ export const addWallet = new Scenes.WizardScene<MyContext>(
 
       return ctx.scene.leave();
     }
-  }
+  },
 );

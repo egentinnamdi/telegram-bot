@@ -1,6 +1,6 @@
 // Websocket when user funds wallet
 import { Wallet } from "../database/schema";
-import { bot, ws } from "../bot";
+import { bot, ws } from "../server";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 // Subscribe to account change socket to notify user of wallet fund success
@@ -36,13 +36,13 @@ export async function watchAccountChanges(publicKey: string) {
         const newBalance = data.value.lamports / LAMPORTS_PER_SOL;
         const wallet = await Wallet.findOneAndUpdate(
           { publicKey },
-          { balance: newBalance }
+          { balance: newBalance },
         );
 
         // Send Notification to User after updating
         bot.telegram.sendMessage(
           wallet?.chatId as string,
-          `✅ Your wallet has been successfully funded, your new wallet balance is ${newBalance} SOL 💵`
+          `✅ Your wallet has been successfully funded, your new wallet balance is ${newBalance} SOL 💵`,
         );
 
         // Unsubscribe from event

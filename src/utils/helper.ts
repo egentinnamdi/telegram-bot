@@ -2,7 +2,7 @@ import { Context } from "telegraf";
 import { Wallet } from "../database/schema";
 import { Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
 import base58 from "bs58";
-import { connection } from "../bot";
+import { connection } from "../server";
 
 export const SWAP_URL = `https://lite-api.jup.ag/ultra/v1/order`;
 const GET_BLOCK_URL = "https://go.getblock.us/bce6ef98e25a4747981b858e7a78b316";
@@ -23,7 +23,7 @@ export async function checkWalletName(ctx: Context, walletName: string) {
 
   if (walletWIthResponseName) {
     ctx.reply(
-      `⚠️ You already have a wallet with the name ${walletName}, Use a different name`
+      `⚠️ You already have a wallet with the name ${walletName}, Use a different name`,
     );
     return false;
   }
@@ -39,7 +39,7 @@ export async function executeTrade({
 }: TransactionType) {
   try {
     const orderResponse = await fetch(
-      `${SWAP_URL}?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&taker=${publicKey}`
+      `${SWAP_URL}?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&taker=${publicKey}`,
     );
     const order = await orderResponse.json();
 
@@ -62,7 +62,7 @@ export async function executeTrade({
     console.log("✅ Transaction sent", signature);
 
     const balance = await connection.getBalance(
-      new PublicKey(publicKey as string)
+      new PublicKey(publicKey as string),
     );
 
     return balance;
@@ -73,7 +73,7 @@ export async function executeTrade({
 }
 
 export async function getBalance(
-  publicKey: PublicKey
+  publicKey: PublicKey,
 ): Promise<number | undefined> {
   try {
     const payload = {

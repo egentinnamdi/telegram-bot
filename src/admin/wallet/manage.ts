@@ -1,5 +1,5 @@
 import { Composer, Context, Scenes } from "telegraf";
-import { MyContext } from "../../bot";
+import { MyContext } from "../../server";
 import { User, Wallet } from "../../database/schema";
 import { escapeMarkdownV2 } from "../../utils/formatText";
 import { WizardScene } from "telegraf/scenes";
@@ -35,7 +35,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
               ],
             ],
           },
-        }
+        },
       );
       ctx.wizard.next();
     } catch (err) {
@@ -54,7 +54,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
     } else if (context?.data === "retrieve_multiple_wallet") {
       (ctx.scene.state as any).query = context?.data;
       ctx.reply(
-        "❗❗❗ Please enter the username of the user whose wallets you want to retrieve"
+        "❗❗❗ Please enter the username of the user whose wallets you want to retrieve",
       );
       return ctx.wizard.next();
     }
@@ -87,7 +87,7 @@ export const getUserWalletScene = new Scenes.WizardScene<MyContext>(
       await allWallets(ctx, "user");
       ctx.scene.leave();
     }
-  }
+  },
 );
 
 // Add SOL scene
@@ -101,7 +101,7 @@ export const addSol = new Scenes.WizardScene<MyContext>(
   async (ctx) => {
     (ctx.scene.state as any).amount = Number(ctx.text);
     ctx.reply(
-      "💰 What is the name of the wallet you want to add to?\n\n⚠️ Type wallet name exactly the way it is, letters are case sensitive"
+      "💰 What is the name of the wallet you want to add to?\n\n⚠️ Type wallet name exactly the way it is, letters are case sensitive",
     );
     ctx.wizard.next();
   },
@@ -118,7 +118,7 @@ export const addSol = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.scene.leave();
     }
-  }
+  },
 );
 
 export const getWallets = new Scenes.WizardScene<MyContext>(
@@ -141,7 +141,7 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
             [{ text: "Continue 👍", callback_data: "continue_wallet" }],
           ],
         },
-      }
+      },
     );
 
     ctx.wizard.next();
@@ -166,7 +166,7 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
       await allWallets(ctx, "global", skip);
 
       ctx.reply(
-        "⬆️ Next feature that will be added to this admin command is the ability to go to the next page using a 'Next' button\n\nStay tuned ✅"
+        "⬆️ Next feature that will be added to this admin command is the ability to go to the next page using a 'Next' button\n\nStay tuned ✅",
       );
 
       ctx.scene.leave();
@@ -175,7 +175,7 @@ export const getWallets = new Scenes.WizardScene<MyContext>(
       ctx.reply((err as Error).message);
       ctx.scene.leave();
     }
-  }
+  },
 );
 
 const allWallets = async (ctx: Context, type: string, skip?: number) => {
@@ -187,7 +187,7 @@ const allWallets = async (ctx: Context, type: string, skip?: number) => {
 
   // Paginate Wallets to retrieve, 10 per page
   const wallets = await Wallet.find(
-    type === "global" ? {} : { userId: user?._id }
+    type === "global" ? {} : { userId: user?._id },
   )
     .skip(skip ?? 0)
     .limit(5);
@@ -222,7 +222,7 @@ export const deleteWallet = new WizardScene<MyContext>(
   "delete-wallets",
   async (ctx) => {
     ctx.reply(
-      "⚠️ List a max of 5 wallets you want to delete per request separating each with a comma and maintain the casing of the wallet name"
+      "⚠️ List a max of 5 wallets you want to delete per request separating each with a comma and maintain the casing of the wallet name",
     );
     ctx.wizard.next();
   },
@@ -245,11 +245,11 @@ export const deleteWallet = new WizardScene<MyContext>(
 
         if (!deletedWallet) {
           ctx.reply(
-            `❌ The wallet "${item}" was not found in the database record\n\n⚠️ Cross-check the spelling and casing and try again`
+            `❌ The wallet "${item}" was not found in the database record\n\n⚠️ Cross-check the spelling and casing and try again`,
           );
         } else {
           ctx.reply(
-            `✅ The wallet ${deletedWallet?.walletName} has been deleted successfully`
+            `✅ The wallet ${deletedWallet?.walletName} has been deleted successfully`,
           );
         }
       });
@@ -260,11 +260,11 @@ export const deleteWallet = new WizardScene<MyContext>(
       ctx.reply((err as Error).message);
       ctx.scene.leave();
     }
-  }
+  },
 );
 
 adminContext.command("adminviewwallet", async (ctx) =>
-  ctx.scene.enter("getUserWallet")
+  ctx.scene.enter("getUserWallet"),
 );
 adminContext.command("adminallwallet", async (ctx) => {
   const user = await User.findOne({ telegramId: ctx.from?.id });
@@ -291,4 +291,3 @@ adminContext.command("admindeletewallets", async (ctx) => {
 
   ctx.scene.enter("delete-wallets");
 });
- 

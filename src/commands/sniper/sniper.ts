@@ -1,5 +1,5 @@
 import { Composer, Scenes } from "telegraf";
-import { agenda, bot, MyContext } from "../../bot";
+import { agenda, bot, MyContext } from "../../server";
 import { User, Wallet } from "../../database/schema";
 import { Job, JobAttributesData } from "agenda";
 import mongoose from "mongoose";
@@ -20,7 +20,7 @@ export const handleSnipeScene = new Scenes.WizardScene<MyContext>(
       const user = await User.findOne({ telegramId: ctx.from?.id });
       if (!user) {
         throw Error(
-          "❌ Your account was not found\n\nPlease run the command /start if you haven't already done that to create an account"
+          "❌ Your account was not found\n\nPlease run the command /start if you haven't already done that to create an account",
         );
       }
 
@@ -45,17 +45,17 @@ export const handleSnipeScene = new Scenes.WizardScene<MyContext>(
 
       if (!wallet.length) {
         throw Error(
-          `❌ You don't have any wallet with at least ${minimumBalance} sol to initiate this process\n\nPlease fund your wallet to at least ${minimumBalance} sols and try again`
+          `❌ You don't have any wallet with at least ${minimumBalance} sol to initiate this process\n\nPlease fund your wallet to at least ${minimumBalance} sols and try again`,
         );
       }
       await ctx.reply(
         "💰 Which wallet do you want to trade with?\n\n" +
           wallet
             .map(
-              (w, index) => `${index + 1}. ${w.walletName} (${w.balance} SOL)`
+              (w, index) => `${index + 1}. ${w.walletName} (${w.balance} SOL)`,
             )
             .join("\n") +
-          "\n\n✅ Select using the wallet index"
+          "\n\n✅ Select using the wallet index",
       );
 
       return ctx.wizard.next();
@@ -63,7 +63,7 @@ export const handleSnipeScene = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.reply(
         (err as unknown as Error).message ||
-          "❌ There was an error, please try again"
+          "❌ There was an error, please try again",
       );
       return ctx.scene.leave();
     }
@@ -95,7 +95,7 @@ export const handleSnipeScene = new Scenes.WizardScene<MyContext>(
           launchPrice * (wallet.tokenMultiplier + Math.random());
         if (currentPrice >= targetPrice) {
           const newBalance = Number(
-            (totalTokenBought * currentPrice).toFixed(2)
+            (totalTokenBought * currentPrice).toFixed(2),
           );
 
           await Wallet.findByIdAndUpdate(wallet._id, {
@@ -107,7 +107,7 @@ export const handleSnipeScene = new Scenes.WizardScene<MyContext>(
             wallet.chatId,
             `✅ ${
               newBalance - currentBalance
-            } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`
+            } SOL profits gained.\n💼 Your new wallet balance is ${newBalance} SOL`,
           );
         }
       });
@@ -129,11 +129,11 @@ export const handleSnipeScene = new Scenes.WizardScene<MyContext>(
       console.log(err);
       ctx.reply(
         (err as unknown as Error).message ||
-          "❌ There was an error, please try again"
+          "❌ There was an error, please try again",
       );
       return ctx.scene.leave();
     }
-  }
+  },
 );
 
 sniperComposer.hears("2x token 🚀", async (ctx) => {
@@ -156,7 +156,7 @@ sniperComposer.hears("❌ Cancel Trade", async (ctx) => {
     { telegramId: ctx.from.id },
     {
       isActive: false,
-    }
+    },
   );
   return ctx.reply("✔️ Trade cancelled successfully!");
 });

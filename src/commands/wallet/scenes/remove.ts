@@ -1,5 +1,5 @@
 import { Scenes } from "telegraf";
-import { MyContext } from "../../../bot";
+import { MyContext } from "../../../server";
 import { Wallet } from "../../../database/schema";
 import { escapeMarkdownV2 } from "../../../utils/formatText";
 
@@ -29,7 +29,7 @@ export const removeWallet = new Scenes.WizardScene<MyContext>(
                 [{ text: "👎 No", callback_data: "remove_wallet_no" }],
               ],
             },
-          }
+          },
         );
         return ctx.wizard.next();
       }
@@ -60,7 +60,7 @@ export const removeWallet = new Scenes.WizardScene<MyContext>(
       } else {
         ctx.replyWithMarkdownV2(
           escapeMarkdownV2(
-            `🗑️ Starting the removal process for wallet '${ctx.text}'.`
+            `🗑️ Starting the removal process for wallet '${ctx.text}'.`,
           ),
           {
             reply_markup: {
@@ -68,7 +68,7 @@ export const removeWallet = new Scenes.WizardScene<MyContext>(
                 [{ text: "👉 Continue", callback_data: ctx.text as string }],
               ],
             },
-          }
+          },
         );
         return ctx.wizard.selectStep(0);
       }
@@ -76,5 +76,5 @@ export const removeWallet = new Scenes.WizardScene<MyContext>(
       console.log(error);
       ctx.scene.leave();
     }
-  }
+  },
 );

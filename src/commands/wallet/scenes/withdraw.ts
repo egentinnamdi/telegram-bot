@@ -1,5 +1,5 @@
 import { Composer, Scenes } from "telegraf";
-import { agenda, bot, MyContext } from "../../../bot";
+import { agenda, bot, MyContext } from "../../../server";
 import { User, Wallet } from "../../../database/schema";
 
 export const withdrawComposer = new Composer<MyContext>();
@@ -76,7 +76,7 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
         ) {
           await bot.telegram.sendMessage(
             wallet?.chatId,
-            `Your funds will arrive soon`
+            `Your funds will arrive soon`,
           );
         }
       });
@@ -94,7 +94,7 @@ export const withdrawFund = new Scenes.WizardScene<MyContext>(
       ctx.reply("An error occcured, please try again");
       return ctx.scene.leave();
     }
-  }
+  },
 );
 
 withdrawComposer.hears("Withdraw 🏦", async (ctx) => {
