@@ -1,10 +1,10 @@
 import { Composer, Scenes } from "telegraf";
-import { agenda, bot, MyContext } from "../../../server";
-import { Wallet } from "../../../database/schema";
-import { escapeMarkdownV2 } from "../../../utils/formatText";
+import { agenda, bot, MyContext } from "../../../server.js";
+import { Wallet } from "../../../database/schema.js";
+import { escapeMarkdownV2 } from "../../../utils/formatText.js";
 import { Context } from "telegraf";
-import { User } from "../../../database/schema";
-import { getBalance } from "../../../utils/helper";
+import { User } from "../../../database/schema.js";
+import { getBalance } from "../../../utils/helper.js";
 
 export const walletComposer = new Composer<MyContext>();
 

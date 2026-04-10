@@ -1,7 +1,7 @@
 import { Composer, Context, Scenes } from "telegraf";
-import { MyContext } from "../../server";
-import { User, Wallet } from "../../database/schema";
-import { escapeMarkdownV2 } from "../../utils/formatText";
+import { MyContext } from "../../server.js";
+import { User, Wallet } from "../../database/schema.js";
+import { escapeMarkdownV2 } from "../../utils/formatText.js";
 import { WizardScene } from "telegraf/scenes";
 
 export const adminContext = new Composer<MyContext>();

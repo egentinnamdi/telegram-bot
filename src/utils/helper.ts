@@ -1,8 +1,8 @@
 import { Context } from "telegraf";
-import { Wallet } from "../database/schema";
+import { Wallet } from "../database/schema.js";
 import { Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
 import base58 from "bs58";
-import { connection } from "../server";
+import { connection } from "../server.js";
 
 export const SWAP_URL = `https://lite-api.jup.ag/ultra/v1/order`;
 const GET_BLOCK_URL = "https://go.getblock.us/bce6ef98e25a4747981b858e7a78b316";

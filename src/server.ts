@@ -1,15 +1,15 @@
 import { Context, Scenes, session, Telegraf } from "telegraf";
 import "dotenv/config";
-import { buyScene } from "./scenes/buy";
+import { buyScene } from "./scenes/buy.js";
 import { Mongo } from "@telegraf/session/mongodb";
 import express from "express";
-import { router as snipeRouter } from "./routes/snipeRoute";
+import { router as snipeRouter } from "./routes/snipeRoute.js";
 import mongoose from "mongoose";
-import { addWallet } from "./commands/wallet/scenes/add";
-import { User, Wallet } from "./database/schema";
-import { walletScene } from "./commands/wallet/scenes/generate";
-import { walletComposer } from "./commands/wallet/composers/manage";
-import { removeWallet } from "./commands/wallet/scenes/remove";
+import { addWallet } from "./commands/wallet/scenes/add.js";
+import { User, Wallet } from "./database/schema.js";
+import { walletScene } from "./commands/wallet/scenes/generate.js";
+import { walletComposer } from "./commands/wallet/composers/manage.js";
+import { removeWallet } from "./commands/wallet/scenes/remove.js";
 import { Connection } from "@solana/web3.js";
 import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
 import { WebSocket } from "ws";
@@ -19,14 +19,14 @@ import {
   deleteWallet,
   getUserWalletScene,
   getWallets,
-} from "./admin/wallet/manage";
-import { handleSnipeScene, sniperComposer } from "./commands/sniper/sniper";
+} from "./admin/wallet/manage.js";
+import { handleSnipeScene, sniperComposer } from "./commands/sniper/sniper.js";
 import Agenda from "agenda";
-import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer";
+import { analyzerComposer, analyzerScene } from "./commands/sniper/analyzer.js";
 import {
   withdrawComposer,
   withdrawFund,
-} from "./commands/wallet/scenes/withdraw";
+} from "./commands/wallet/scenes/withdraw.js";
 
 export const bot = new Telegraf<Scenes.WizardContext>(
   process.env.BOT_TOKEN as string,
@@ -46,7 +46,8 @@ export const ws = new WebSocket(
 );
 
 mongoose
-  .connect(`${process.env.DATABASE_STRING}/my-telegram-bot`)
+  // .connect(`${process.env.DATABASE_STRING}/my-telegram-bot`)
+  .connect(`${process.env.DATABASE_STRING}`)
   .then(() => console.log("Database Connection Established"));
 export type MyContext = Scenes.WizardContext<Scenes.WizardSessionData>;
 
@@ -68,6 +69,11 @@ agenda.start();
 
 // Middleware to parse json
 app.use(express.json());
+
+// Health Check
+app.get("/", (_req, res) => {
+  res.send("Backend Running");
+});
 
 // all request about sniping goes here
 app.use("/snipe", snipeRouter);

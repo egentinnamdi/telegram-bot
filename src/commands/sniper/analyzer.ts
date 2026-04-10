@@ -1,6 +1,6 @@
 import { Composer, Scenes } from "telegraf";
-import { MyContext } from "../../server";
-import { TokenPriceType } from "../../routes/snipeRoute";
+import { MyContext } from "../../server.js";
+import { TokenPriceType } from "../../routes/snipeRoute.js";
 
 export const analyzerComposer = new Composer<MyContext>();
 export const DEX_ENDPOINT = "https://api.dexscreener.com/token-pairs/v1/solana";

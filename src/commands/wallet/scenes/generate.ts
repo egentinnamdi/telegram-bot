@@ -1,10 +1,10 @@
 import { Keypair } from "@solana/web3.js";
 import { Scenes } from "telegraf";
-import { connection, MyContext } from "../../../server";
-import { User, Wallet } from "../../../database/schema";
+import { connection, MyContext } from "../../../server.js";
+import { User, Wallet } from "../../../database/schema.js";
 import mongoose from "mongoose";
 import base58 from "bs58";
-import { checkWalletName, getBalance } from "../../../utils/helper";
+import { checkWalletName, getBalance } from "../../../utils/helper.js";
 
 export const walletScene = new Scenes.WizardScene<MyContext>(
   "walletScene",

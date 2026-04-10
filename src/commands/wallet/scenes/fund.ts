@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
-import { connection, MyContext } from "../../../server";
-import { watchAccountChanges } from "../../../services/subscription.service";
-import { User, Wallet } from "../../../database/schema";
+import { connection, MyContext } from "../../../server.js";
+import { watchAccountChanges } from "../../../services/subscription.service.js";
+import { User, Wallet } from "../../../database/schema.js";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 // Once user hits the fund_wallet action, this activates

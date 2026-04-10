@@ -1,6 +1,6 @@
 import { Composer, Scenes } from "telegraf";
-import { agenda, bot, MyContext } from "../../server";
-import { User, Wallet } from "../../database/schema";
+import { agenda, bot, MyContext } from "../../server.js";
+import { User, Wallet } from "../../database/schema.js";
 import { Job, JobAttributesData } from "agenda";
 import mongoose from "mongoose";
 

@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf";
-import { MyContext } from "../../../server";
-import { Wallet } from "../../../database/schema";
-import { escapeMarkdownV2 } from "../../../utils/formatText";
+import { MyContext } from "../../../server.js";
+import { Wallet } from "../../../database/schema.js";
+import { escapeMarkdownV2 } from "../../../utils/formatText.js";
 
 export const removeWallet = new Scenes.WizardScene<MyContext>(
   "removeWallet",

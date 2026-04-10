@@ -1,6 +1,6 @@
 // Websocket when user funds wallet
-import { Wallet } from "../database/schema";
-import { bot, ws } from "../server";
+import { Wallet } from "../database/schema.js";
+import { bot, ws } from "../server.js";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 // Subscribe to account change socket to notify user of wallet fund success

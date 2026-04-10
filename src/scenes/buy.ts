@@ -1,5 +1,5 @@
 import { Scenes } from "telegraf";
-import { MyContext } from "../server";
+import { MyContext } from "../server.js";
 
 // We are telling telegraf the kind of scene of scene we want ot set up
 export const buyScene = new Scenes.WizardScene<MyContext>(

@@ -2,8 +2,8 @@
 // At this point, we are giving full control of the trade and wallet to the bot
 
 import { InferSchemaType } from "mongoose";
-import { connection, ws } from "../server";
-import { walletSchema } from "../database/schema";
+import { connection, ws } from "../server.js";
+import { walletSchema } from "../database/schema.js";
 import { GetProgramAccountsConfig, PublicKey } from "@solana/web3.js";
 
 export async function initiateSnipeProcess(

@@ -1,11 +1,11 @@
 import express from "express";
-import { Meta, Wallet, walletSchema } from "../database/schema";
-import { agenda, bot } from "../server";
+import { Meta, Wallet, walletSchema } from "../database/schema.js";
+import { agenda, bot } from "../server.js";
 import { DEX_ENDPOINT } from "../commands/sniper/analyzer";
 import mongoose, { InferSchemaType } from "mongoose";
-import { executeTrade } from "../utils/helper";
+import { executeTrade } from "../utils/helper.js";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { getAndAnalyzeDetailedTokenReport } from "../utils/checks";
+import { getAndAnalyzeDetailedTokenReport } from "../utils/checks.js";
 
 export const router = express.Router();
 

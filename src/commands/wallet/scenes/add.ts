@@ -1,11 +1,11 @@
 import { Keypair } from "@solana/web3.js";
 import base58 from "bs58";
 import { Scenes } from "telegraf";
-import { connection, MyContext } from "../../../server";
-import { User, userSchema, Wallet } from "../../../database/schema";
+import { connection, MyContext } from "../../../server.js";
+import { User, userSchema, Wallet } from "../../../database/schema.js";
 import { InferSchemaType, Types } from "mongoose";
-import { escapeMarkdownV2 } from "../../../utils/formatText";
-import { checkWalletName, getBalance } from "../../../utils/helper";
+import { escapeMarkdownV2 } from "../../../utils/formatText.js";
+import { checkWalletName, getBalance } from "../../../utils/helper.js";
 import { mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
 
