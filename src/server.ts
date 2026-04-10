@@ -11,7 +11,7 @@ import { walletScene } from "./commands/wallet/scenes/generate.js";
 import { walletComposer } from "./commands/wallet/composers/manage.js";
 import { removeWallet } from "./commands/wallet/scenes/remove.js";
 import { Connection } from "@solana/web3.js";
-import { fundWallet, testFund } from "./commands/wallet/scenes/fund";
+import { fundWallet, testFund } from "./commands/wallet/scenes/fund.js";
 import { WebSocket } from "ws";
 import {
   addSol,

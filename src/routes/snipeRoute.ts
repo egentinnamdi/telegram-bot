@@ -1,7 +1,7 @@
 import express from "express";
 import { Meta, Wallet, walletSchema } from "../database/schema.js";
 import { agenda, bot } from "../server.js";
-import { DEX_ENDPOINT } from "../commands/sniper/analyzer";
+import { DEX_ENDPOINT } from "../commands/sniper/analyzer.js";
 import mongoose, { InferSchemaType } from "mongoose";
 import { executeTrade } from "../utils/helper.js";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
