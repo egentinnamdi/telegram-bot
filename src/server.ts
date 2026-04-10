@@ -245,4 +245,5 @@ bot.command("buy", async (ctx) => await ctx.scene.enter("buyScene"));
 bot.command("addwallet", async (ctx) => await ctx.scene.enter("addWallet"));
 bot.command("test", async (ctx) => await ctx.scene.enter("test"));
 
-app.listen(port, () => console.log(`Server is up and running on port ${port}`));
+// app.listen(port, () => console.log(`Server is up and running on port ${port}`));
+export default app;
