@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@solana/web3.js": "^1.98.2",
     "@telegraf/session": "^2.0.0-beta.7",
