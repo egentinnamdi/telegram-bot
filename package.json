@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
-    "start": "node -r tsconfig-paths/register dist/server.js",
+    "build": "npx tsc",
+    "start": "node -r tsconfig-paths/register dist/src/server.js",
     "vercel-build": "npx tsc"
   },
   "keywords": [],
